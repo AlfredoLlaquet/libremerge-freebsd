@@ -2,6 +2,8 @@
 
 This repository contains the source for an independently maintained FreeBSD port of LibreMerge, a graphical tool for comparing and merging files and folders. The upstream project is at <https://github.com/iagodpassos/libremerge>.
 
+Programmed by **ChatGPT** for Alfredo Llaquet-Alsina.
+
 ## Install on FreeBSD
 
 Tested on FreeBSD 15.1-RELEASE-p6 (amd64) with the base system’s Clang and `make`. These steps install LibreMerge under `/usr/local`.

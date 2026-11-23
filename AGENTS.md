@@ -13,6 +13,8 @@ Use the following repository description verbatim.
 
 Keep the application name **LibreMerge**. The goal is to make the existing Qt 6 file and folder comparison and merge application build and run natively on FreeBSD. Its immediate upstream is `iagodpassos/libremerge`, which uses WinMerge’s comparison engine. Keep FreeBSD changes focused so the interface and comparison behavior stay familiar and future releases are easy to merge. [Upstream LibreMerge](https://github.com/iagodpassos/libremerge)
 
+Programmed by **ChatGPT** for Alfredo Llaquet-Alsina.
+
 ## Marking FreeBSD code changes
 
 Use one pair of `LM4FBS` markers around each logical block changed for this port. Keep the marker words the same in every language and use the file’s own comment syntax. Add a short reason to the opening marker when it helps explain the change.
@@ -49,13 +51,15 @@ The commented original must match the upstream revision currently used by this f
 
 ### Native FreeBSD validation
 
+Keep the `FreeBSD` workflow (`.github/workflows/freebsd.yml`) enabled for this fork’s automated tests. Keep the inherited `CI` workflow (`.github/workflows/ci.yml`), which tests macOS and Linux, disabled in the fork’s GitHub Actions settings. Keep `ci.yml` synchronized with upstream and recheck the setting if an upstream update renames or replaces that workflow.
+
 The initial FreeBSD changes date from November 23, 2026. The fork starts at upstream commit `7ae6fb9e3e306729675745f4fc7add809c57fda7`, 15 commits after `v1.5.0`. Its validation target is FreeBSD 15.1-RELEASE on amd64. The fork’s FreeBSD workflow builds with base Clang and `/usr/bin/make` as a regular user, installs into `/usr/local` as root, and exercises the installed program as the regular user.
 
 Keep coverage for two FreeBSD behaviors when integrating upstream changes. The engine locates its executable through `KERN_PROC_PATHNAME`, including when procfs is unmounted. Folder operations can use the desktop Trash on a fresh account, and an overwritten file must remain recoverable with its original contents. The workflow also opens file and folder comparisons on a virtual X11 display and checks a saved merge and its backup against the expected bytes.
 
 ### Keeping the README in sync
 
-Maintain the FreeBSD notice at the top of `README.md`, including the full, clickable upstream project URL. Keep FreeBSD-specific README edits in that notice. Preserve the visible space before the first horizontal rule (`---`) and the blank line after it.
+Maintain the FreeBSD notice at the top of `README.md`, including the programming credit from “Purpose and name” and the full, clickable upstream project URL. Keep FreeBSD-specific README edits in that notice. Preserve the visible space before the first horizontal rule (`---`) and the blank line after it.
 
 Keep the notice’s FreeBSD installation instructions in step with the commands verified in the VM, including dependency packages, cloning this fork, building, running CTest, and installing with `make install`.
 
