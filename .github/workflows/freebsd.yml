@@ -1,0 +1,60 @@
+# LM4FBS BEGIN ADDITION
+name: FreeBSD
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  freebsd:
+    name: Build, install and test on FreeBSD 15.1 amd64
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: vmactions/freebsd-vm@811efaaac0668df8bfb8308c3ec997b5ab50037b # v1.6.0
+        with:
+          release: '15.1'
+          copyback: false
+          prepare: |
+            pkg install -y git cmake qt6-base qt6-svg qt6-imageformats qt6-translations \
+              poco boost-libs icu re2c lemon googletest bash xorg-vfbserver dejavu
+          run: |
+            set -eu
+            uname -a
+            cmake -S . -B build -G 'Unix Makefiles' -DCMAKE_MAKE_PROGRAM=/usr/bin/make \
+              -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+            make -C build -j2
+            ctest --test-dir build --output-on-failure --no-tests=error
+            make -C build install
+
+            app=/usr/local/bin/libremerge
+            test -x "$app"
+            work=$(mktemp -d)
+            export XDG_CONFIG_HOME="$work/config" XDG_DATA_HOME="$work/data"
+            export XDG_RUNTIME_DIR="$work/runtime" LC_ALL=en_US.UTF-8
+            mkdir -m 700 "$XDG_RUNTIME_DIR"
+            QT_QPA_PLATFORM=offscreen bash packaging/run_selftests.sh "$app"
+
+            Xvfb -screen 0 1280x900x24 -nolisten tcp -displayfd 1 > "$work/display" &
+            server=$!
+            trap 'kill "$server" 2>/dev/null || true; rm -rf "$work"' EXIT
+            for attempt in $(jot 30); do
+              [ ! -s "$work/display" ] || break
+              kill -0 "$server"
+              sleep 1
+            done
+            test -s "$work/display"
+            export DISPLAY=":$(cat "$work/display")" QT_QPA_PLATFORM=xcb
+            mkdir "$work/left" "$work/right"
+            printf 'first\nleft\nlast\n' > "$work/left/example.txt"
+            printf 'first\nright\nlast\n' > "$work/right/example.txt"
+            "$app" --screenshot "$work/files.png" "$work/left/example.txt" "$work/right/example.txt"
+            "$app" --screenshot "$work/folders.png" "$work/left" "$work/right"
+            test -s "$work/files.png"
+            test -s "$work/folders.png"
+            "$app" --selftest-folder-sync
+# LM4FBS END
