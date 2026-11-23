@@ -215,6 +215,10 @@ QString AboutDialog::platformText()
 	const QString platform = QStringLiteral("macOS");
 #elif defined(Q_OS_LINUX)
 	const QString platform = QStringLiteral("Linux");
+// LM4FBS BEGIN ADDITION — Preserve FreeBSD’s name in the platform label.
+#elif defined(Q_OS_FREEBSD)
+	const QString platform = QStringLiteral("FreeBSD");
+// LM4FBS END
 #else
 	const QString platform = QSysInfo::kernelType();
 #endif

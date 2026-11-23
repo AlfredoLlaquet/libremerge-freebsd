@@ -12,23 +12,30 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
       - uses: vmactions/freebsd-vm@811efaaac0668df8bfb8308c3ec997b5ab50037b # v1.6.0
         with:
           release: '15.1'
-          copyback: false
+          sync: 'no'
+          envs: 'GITHUB_SHA GITHUB_REF'
           prepare: |
             pkg install -y git cmake qt6-base qt6-svg qt6-imageformats qt6-translations \
               poco boost-libs icu re2c lemon googletest bash xorg-vfbserver dejavu
           run: |
             set -eu
             uname -a
-            cmake -S . -B build -G 'Unix Makefiles' -DCMAKE_MAKE_PROGRAM=/usr/bin/make \
-              -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
-            make -C build -j2
-            ctest --test-dir build --output-on-failure --no-tests=error
+            pw useradd -n lmbuild -m -s /bin/sh
+            cd /home/lmbuild
+            su lmbuild -c 'git clone https://github.com/AlfredoLlaquet/libremerge-freebsd.git'
+            cd libremerge-freebsd
+            su lmbuild -c '
+              set -eu
+              git fetch origin "$GITHUB_REF"
+              git checkout --detach "$GITHUB_SHA"
+              cmake -S . -B build -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make \
+                -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+              make -C build -j2
+              ctest --test-dir build --output-on-failure --no-tests=error
+            '
             make -C build install
 
             app=/usr/local/bin/libremerge
@@ -52,9 +59,13 @@ jobs:
             mkdir "$work/left" "$work/right"
             printf 'first\nleft\nlast\n' > "$work/left/example.txt"
             printf 'first\nright\nlast\n' > "$work/right/example.txt"
+            cp "$work/right/example.txt" "$work/before.txt"
             "$app" --screenshot "$work/files.png" "$work/left/example.txt" "$work/right/example.txt"
             "$app" --screenshot "$work/folders.png" "$work/left" "$work/right"
             test -s "$work/files.png"
             test -s "$work/folders.png"
             "$app" --selftest-folder-sync
+            "$app" --selftest-save "$work/left/example.txt" "$work/right/example.txt"
+            cmp "$work/left/example.txt" "$work/right/example.txt"
+            cmp "$work/before.txt" "$work/right/example.txt.bak"
 # LM4FBS END
