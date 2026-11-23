@@ -2,6 +2,41 @@
 
 This repository contains the source for an independently maintained FreeBSD port of LibreMerge, a graphical tool for comparing and merging files and folders. The upstream project is at <https://github.com/iagodpassos/libremerge>.
 
+## Install on FreeBSD
+
+Tested on FreeBSD 15.1-RELEASE-p6 (amd64) with the base system’s Clang and `make`. These steps install LibreMerge under `/usr/local`.
+
+1. In a root shell, install the dependencies.
+
+   ```sh
+   pkg install git cmake qt6-base qt6-svg qt6-imageformats qt6-translations \
+       poco boost-libs icu re2c lemon googletest
+   ```
+
+2. As your regular user, clone this fork, build the application, and run its tests. The first CMake configuration downloads the syntax-highlighting grammars.
+
+   ```sh
+   git clone https://github.com/AlfredoLlaquet/libremerge-freebsd.git
+   cd libremerge-freebsd
+   cmake -S . -B build -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make \
+       -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+   cd build
+   make -j2
+   ctest --output-on-failure
+   ```
+
+3. From the same `build` directory, install with root privileges.
+
+   ```sh
+   su root -c 'make install'
+   ```
+
+4. In your graphical desktop session, start LibreMerge as your regular user.
+
+   ```sh
+   libremerge
+   ```
+
 Everything below the horizontal rule is the upstream LibreMerge README, reproduced verbatim from the revision used by this fork. Its download and installation instructions describe the upstream macOS and Linux releases.
 
 <br><br>
