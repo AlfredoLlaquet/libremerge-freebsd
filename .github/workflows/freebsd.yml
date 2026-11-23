@@ -19,7 +19,7 @@ jobs:
           envs: 'GITHUB_SHA GITHUB_REF'
           prepare: |
             pkg install -y git cmake qt6-base qt6-svg qt6-imageformats qt6-translations \
-              poco boost-libs icu re2c lemon googletest bash xorg-vfbserver dejavu
+              poco boost-libs icu re2c lemon googletest
           run: |
             set -eu
             uname -a
@@ -33,17 +33,28 @@ jobs:
               git checkout --detach "$GITHUB_SHA"
               cmake -S . -B build -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make \
                 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
-              make -C build -j2
-              ctest --test-dir build --output-on-failure --no-tests=error
+              cd build
+              make -j2
+              ctest --output-on-failure --no-tests=error
             '
-            make -C build install
+            (cd build && su root -c 'make install')
 
+            pkg install -y bash xorg-vfbserver dejavu
+            su lmbuild -c 'sh -s' <<'GUI_TESTS'
+            set -eu
             app=/usr/local/bin/libremerge
             test -x "$app"
+            test -r /usr/local/share/applications/libremerge.desktop
+            test -x /usr/local/share/kio/servicemenus/libremerge.desktop
             work=$(mktemp -d)
             export XDG_CONFIG_HOME="$work/config" XDG_DATA_HOME="$work/data"
             export XDG_RUNTIME_DIR="$work/runtime" LC_ALL=en_US.UTF-8
             mkdir -m 700 "$XDG_RUNTIME_DIR"
+            # Exercise the first use of Trash in a freshly created account.
+            test ! -d "$XDG_DATA_HOME"
+            QT_QPA_PLATFORM=offscreen "$app" --selftest-folder3-ops
+            test -s "$XDG_DATA_HOME/Trash/info/a.txt.trashinfo"
+            printf '1\n' | cmp - "$XDG_DATA_HOME/Trash/files/a.txt"
             QT_QPA_PLATFORM=offscreen bash packaging/run_selftests.sh "$app"
 
             Xvfb -screen 0 1280x900x24 -nolisten tcp -displayfd 1 > "$work/display" &
@@ -65,7 +76,12 @@ jobs:
             test -s "$work/files.png"
             test -s "$work/folders.png"
             "$app" --selftest-folder-sync
+            status=0
+            "$app" -noninteractive -enableexitcode -noprefs "$work/left/example.txt" "$work/right/example.txt" || status=$?
+            test "$status" -eq 1
             "$app" --selftest-save "$work/left/example.txt" "$work/right/example.txt"
             cmp "$work/left/example.txt" "$work/right/example.txt"
             cmp "$work/before.txt" "$work/right/example.txt.bak"
+            "$app" -noninteractive -enableexitcode -noprefs "$work/left/example.txt" "$work/right/example.txt"
+            GUI_TESTS
 # LM4FBS END

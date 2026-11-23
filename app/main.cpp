@@ -11602,6 +11602,11 @@ int main(int argc, char *argv[])
 
 	if (parser.isSet(selftestFolder3OpsOpt))
 	{
+// LM4FBS BEGIN ADDITION — Report a failed file operation even on a headless test run.
+#ifdef Q_OS_FREEBSD
+		lm::setUnattended(true);
+#endif
+// LM4FBS END
 		// WinMerge's 3-way DirView operations: pairwise copies leave the
 		// row "not compared", deletes recompute from existence and drop
 		// rows that ran out of sides
