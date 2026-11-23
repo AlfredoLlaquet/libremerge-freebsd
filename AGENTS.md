@@ -19,6 +19,12 @@ Keep the application name **LibreMerge**. The goal is to make the existing Qt 6 
 2. Before publishing, build and test the merged version in a **FreeBSD virtual machine**. Run the existing CTest suite and application self-tests. Verify that the Qt application launches, compares files and folders, and saves a merge result. Fix FreeBSD regressions in this fork.
 3. Identify the upstream tag in each downstream release. Record the FreeBSD version and what was actually tested, including any gaps. Publish a tagged source archive that corresponds to the release.
 
+### Keeping the README in sync
+
+Maintain the FreeBSD notice at the top of `README.md`, including the full, clickable upstream project URL. Keep FreeBSD-specific README edits in that notice. Preserve the visible space before the first horizontal rule (`---`) and the blank line after it.
+
+When integrating an upstream tag or commit, copy the complete `README.md` from that exact revision below the divider. Verify that the text after the divider and its blank line matches the upstream file byte for byte.
+
 ## Licensing and FreeBSD packages
 
 LibreMerge as a whole is licensed under **GNU GPL version 3 or later**. Preserve copyright and license notices, retain the notices for bundled components, and identify and date downstream modifications. When distributing a binary, make its complete corresponding source available, including the FreeBSD patches and build scripts used for that release. [License](LICENSE) · [Bundled components and their licenses](docs/VENDORED.md)

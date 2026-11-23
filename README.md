@@ -1,3 +1,13 @@
+# LibreMerge for FreeBSD
+
+This repository contains the source for an independently maintained FreeBSD port of LibreMerge, a graphical tool for comparing and merging files and folders. The upstream project is at <https://github.com/iagodpassos/libremerge>.
+
+Everything below the horizontal rule is the upstream LibreMerge README, reproduced verbatim from the revision used by this fork. Its download and installation instructions describe the upstream macOS and Linux releases.
+
+<br><br>
+
+---
+
 # LibreMerge
 
 **A free, open-source differencing and merging tool for macOS (and Linux) — bringing the WinMerge experience beyond Windows.**
