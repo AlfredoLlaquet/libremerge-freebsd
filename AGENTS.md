@@ -13,6 +13,34 @@ Use the following repository description verbatim.
 
 Keep the application name **LibreMerge**. The goal is to make the existing Qt 6 file and folder comparison and merge application build and run natively on FreeBSD. Its immediate upstream is `iagodpassos/libremerge`, which uses WinMerge’s comparison engine. Keep FreeBSD changes focused so the interface and comparison behavior stay familiar and future releases are easy to merge. [Upstream LibreMerge](https://github.com/iagodpassos/libremerge)
 
+## Marking FreeBSD code changes
+
+Use one pair of `LM4FBS` markers around each logical block changed for this port. Keep the marker words the same in every language and use the file’s own comment syntax. Add a short reason to the opening marker when it helps explain the change.
+
+For a replacement, start with `LM4FBS BEGIN` and preserve the complete upstream block immediately below it as comments, retaining its line breaks and indentation. Put `LM4FBS REPLACEMENT` on its own comment line, followed by the active replacement block and then `LM4FBS END`. This C++ example shows the five parts together.
+
+```cpp
+// LM4FBS BEGIN — Honor the configured temporary directory.
+// const QString directory = QStringLiteral("/tmp");
+// return QDir(directory).filePath(fileName);
+// LM4FBS REPLACEMENT
+const QString directory = QDir::tempPath();
+return QDir(directory).filePath(fileName);
+// LM4FBS END
+```
+
+For entirely new code, put the active block directly between `LM4FBS BEGIN ADDITION` and `LM4FBS END`. A CMake addition uses the same markers with `#` comments.
+
+```cmake
+# LM4FBS BEGIN ADDITION
+if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+    message(STATUS "Building LibreMerge for FreeBSD")
+endif()
+# LM4FBS END
+```
+
+The commented original must match the upstream revision currently used by this fork. When a later upstream version changes that block, refresh the commented copy and review the active FreeBSD replacement against it as part of the same update.
+
 ## Following LibreMerge releases
 
 1. Use `origin` for this fork and `upstream` for `iagodpassos/libremerge`. For each new stable LibreMerge release, fetch its tag and merge it into the fork. Resolve conflicts here and review which FreeBSD patches are still needed.
