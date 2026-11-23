@@ -14,6 +14,13 @@
 #include "OptionsDef.h"
 #include "MergeApp.h"
 
+// LM4FBS BEGIN ADDITION
+#ifdef __FreeBSD__
+#include <cstdlib>
+#include <ctime>
+#endif
+// LM4FBS END
+
 #pragma execution_character_set("utf-8")
 
 struct FilterTestParam { bool optimize; };
@@ -4637,6 +4644,79 @@ TEST_P(FilterExpressionTest, ContainsWhateverTheCase)
 	EXPECT_TRUE(fe.Parse("\"an error at the end\" contains \"error\""));
 	EXPECT_TRUE(fe.Evaluate(di));
 }
+
+// LM4FBS BEGIN ADDITION — Check historical local times against independently specified UTC instants.
+#ifdef __FreeBSD__
+TEST_P(FilterExpressionTest, FreeBSDFiltersUseTheOffsetOfTheDate)
+{
+	const char *previous = std::getenv("TZ");
+	struct RestoreTimeZone {
+		bool wasSet;
+		std::string value;
+		~RestoreTimeZone()
+		{
+			if (wasSet)
+				::setenv("TZ", value.c_str(), 1);
+			else
+				::unsetenv("TZ");
+			::tzset();
+		}
+	} restore{previous != nullptr, previous ? previous : ""};
+	// The last Sundays in March and October, with no dependency on installed zoneinfo.
+	ASSERT_EQ(::setenv("TZ", "CET-1CEST,M3.5.0/2,M10.5.0/3", 1), 0);
+	::tzset();
+
+	PathContext paths(".", ".");
+	CDiffContext ctxt(paths, 0);
+	DIFFITEM di;
+	di.diffcode.setSideFlag(0);
+	FilterExpression fe;
+	fe.SetDiffContext(&ctxt);
+	fe.optimize = GetParam().optimize;
+
+	const auto check = [&](const char *expression, const Poco::DateTime &utc) {
+		SCOPED_TRACE(expression);
+		di.diffFileInfo[0].mtime = utc.timestamp();
+		ASSERT_TRUE(fe.Parse(expression)) << fe.errorMessage;
+		EXPECT_TRUE(fe.Evaluate(di));
+	};
+
+	check(R"(LeftDate == d"2025-01-12 00:30:00")", Poco::DateTime(2025, 1, 11, 23, 30));
+	check(R"(LeftDate == d"2025-07-12 00:30:00")", Poco::DateTime(2025, 7, 11, 22, 30));
+	check(R"(LeftDate == toDateTime("2025-07-12T12:34:56+05:30"))", Poco::DateTime(2025, 7, 12, 7, 4, 56));
+	check(R"(LeftDate == d"2025-01-12T12:34:56-03:30")", Poco::DateTime(2025, 1, 12, 16, 4, 56));
+	check(R"(LeftDate == d"20250112T123456-0330")", Poco::DateTime(2025, 1, 12, 16, 4, 56));
+	check(R"(LeftDate == d"2025-01-12T12:34-03:30")", Poco::DateTime(2025, 1, 12, 16, 4));
+	check(R"(LeftDate == d"2025-07-12T12:34:56+00")", Poco::DateTime(2025, 7, 12, 12, 34, 56));
+	check(R"(LeftDate == d"2025-07-12T12:34:56.123456Z")", Poco::DateTime(2025, 7, 12, 12, 34, 56, 123, 456));
+
+	// Unambiguous local times immediately around spring and on either side of autumn's repeated hour.
+	check(R"(LeftDate == d"2025-03-30 01:59:59")", Poco::DateTime(2025, 3, 30, 0, 59, 59));
+	check(R"(LeftDate == d"2025-03-30 03:00:00")", Poco::DateTime(2025, 3, 30, 1));
+	check(R"(LeftDate == d"2025-10-26 01:59:59")", Poco::DateTime(2025, 10, 25, 23, 59, 59));
+	check(R"(LeftDate == d"2025-10-26 03:00:00")", Poco::DateTime(2025, 10, 26, 2));
+
+	// The same UTC hour falls on different local calendar dates in winter and summer.
+	check(R"(LeftDateStr == "2025-01-12")", Poco::DateTime(2025, 1, 12, 22, 30));
+	check(R"(LeftDateStr == "2025-07-13")", Poco::DateTime(2025, 7, 12, 22, 30));
+
+	// Sunday midnight keeps the offset from before the clock change, even on later weekdays.
+	const Poco::DateTime springSunday(2025, 3, 29, 23);
+	check(R"(startOfWeek(d"2025-03-30 01:59:59") == LeftDate)", springSunday);
+	check(R"(startOfWeek(d"2025-03-30 03:00:00") == LeftDate)", springSunday);
+	check(R"(startOfWeek("2025-04-02 12:00:00") == LeftDate)", springSunday);
+	const Poco::DateTime autumnSunday(2025, 10, 25, 22);
+	check(R"(startOfWeek(d"2025-10-26 01:59:59") == LeftDate)", autumnSunday);
+	check(R"(startOfWeek(d"2025-10-26 03:00:00") == LeftDate)", autumnSunday);
+	check(R"(startOfWeek("2025-10-27 12:00:00") == LeftDate)", autumnSunday);
+
+	// The original July filter examples, checked against UTC instead of a second parsed literal.
+	check(R"(startOfWeek(d"2025-07-12 12:34:56") == LeftDate)", Poco::DateTime(2025, 7, 5, 22));
+	check(R"(startOfMonth(d"2025-07-12 12:34:56") == LeftDate)", Poco::DateTime(2025, 6, 30, 22));
+	check(R"(startOfYear(d"2025-07-12 12:34:56") == LeftDate)", Poco::DateTime(2024, 12, 31, 23));
+}
+#endif
+// LM4FBS END
 
 INSTANTIATE_TEST_SUITE_P(
 	OptimizationCases,

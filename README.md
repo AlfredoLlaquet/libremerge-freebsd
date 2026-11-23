@@ -15,7 +15,7 @@ Tested on FreeBSD 15.1-RELEASE-p6 (amd64) with the base system’s Clang and `ma
        poco boost-libs icu re2c lemon googletest
    ```
 
-2. As your regular user, clone this fork, build the application, and run its tests. The first CMake configuration downloads the syntax-highlighting grammars.
+2. As your regular user, clone this fork and build the application. The first CMake configuration downloads the syntax-highlighting grammars.
 
    ```sh
    git clone https://github.com/AlfredoLlaquet/libremerge-freebsd.git
@@ -24,7 +24,6 @@ Tested on FreeBSD 15.1-RELEASE-p6 (amd64) with the base system’s Clang and `ma
        -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
    cd build
    make -j2
-   ctest --output-on-failure
    ```
 
 3. From the same `build` directory, install with root privileges.
@@ -38,6 +37,35 @@ Tested on FreeBSD 15.1-RELEASE-p6 (amd64) with the base system’s Clang and `ma
    ```sh
    libremerge
    ```
+
+## Update on FreeBSD
+
+As your regular user, open a terminal in the **top level of your existing clone** (the `libremerge-freebsd` directory containing `CMakeLists.txt`). On the `main` branch, pull the latest changes and rebuild using the same `build` directory.
+
+```sh
+git switch main
+git pull --ff-only origin main
+cmake -S . -B build -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make \
+    -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+cd build
+make -j2
+```
+
+From that same `build` directory, reinstall with root privileges. The next time you launch `libremerge`, it will run the updated version.
+
+```sh
+su root -c 'make install'
+```
+
+## Run the automated tests (optional)
+
+After building, you can run CTest as your regular user from the `libremerge-freebsd/build` directory created in step 2. It checks the comparison engine and image merging, including file and folder comparisons, filters, and how dates are interpreted in your local time zone.
+
+```sh
+ctest --output-on-failure
+```
+
+CTest prints the name and output of each failed test. The full log for the most recent run is `Testing/Temporary/LastTest.log`, relative to the build directory.
 
 Everything below the horizontal rule is the upstream LibreMerge README, reproduced verbatim from the revision used by this fork. Its download and installation instructions describe the upstream macOS and Linux releases.
 

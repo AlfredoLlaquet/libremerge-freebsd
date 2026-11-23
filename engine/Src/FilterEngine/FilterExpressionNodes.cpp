@@ -19,6 +19,11 @@
 #include <string>
 #include <variant>
 #include <cctype>
+// LM4FBS BEGIN ADDITION
+#ifdef __FreeBSD__
+#include <ctime>
+#endif
+// LM4FBS END
 #include <limits>
 #include <Poco/RegularExpression.h>
 #include <Poco/Exception.h>
@@ -1008,11 +1013,48 @@ static auto FileEOLStrField(int index, const FilterEvalContext& ectxt) -> ValueT
 	return EOLStr(GetEOLStyleFromStats(ectxt.di->diffFileInfo[index].m_textStats));
 }
 
+// LM4FBS BEGIN ADDITION — Let FreeBSD resolve the local offset at the date being compared.
+#ifdef __FreeBSD__
+static Poco::Timestamp localFilterTimestamp(const Poco::DateTime& date)
+{
+	std::tm civil{};
+	civil.tm_year = date.year() - 1900;
+	civil.tm_mon = date.month() - 1;
+	civil.tm_mday = date.day();
+	civil.tm_hour = date.hour();
+	civil.tm_min = date.minute();
+	civil.tm_sec = date.second();
+	civil.tm_isdst = -1;
+	civil.tm_wday = -1;
+	const auto seconds = std::mktime(&civil);
+	// The second immediately before the Unix epoch is also represented by -1.
+	if (seconds == static_cast<std::time_t>(-1) && civil.tm_wday == -1)
+		throw Poco::RangeException("Local filter date is outside the supported range");
+	return Poco::Timestamp::fromEpochTime(seconds) + date.millisecond() * 1000 + date.microsecond();
+}
+
+static Poco::LocalDateTime filterLocalDateTime(const Poco::Timestamp& timestamp)
+{
+	const auto seconds = timestamp.epochTime();
+	std::tm civil{};
+	if (!::localtime_r(&seconds, &civil))
+		throw Poco::RangeException("Cannot resolve local filter date");
+	return Poco::LocalDateTime(static_cast<int>(civil.tm_gmtoff), timestamp);
+}
+#endif
+// LM4FBS END
+
 // Helper function to parse date/time strings with multiple format support
 static std::optional<Poco::Timestamp> ParseDateTime(const std::string& str)
 {
 	static const std::vector<std::string> formats = {
+		// LM4FBS BEGIN — The fractional format also accepts whole seconds.
+		// Poco::DateTimeFormat::ISO8601_FORMAT,
+		// LM4FBS REPLACEMENT
+#ifndef __FreeBSD__
 		Poco::DateTimeFormat::ISO8601_FORMAT,
+#endif
+		// LM4FBS END
 		Poco::DateTimeFormat::ISO8601_FRAC_FORMAT,
 		"%Y/%m/%d %H:%M:%S",
 		"%Y.%m.%d %H:%M:%S",
@@ -1022,14 +1064,50 @@ static std::optional<Poco::Timestamp> ParseDateTime(const std::string& str)
 		"%Y.%m.%d",
 	};
 
+	// LM4FBS BEGIN ADDITION — Separate the zone before parsing a clock with optional seconds.
+#ifdef __FreeBSD__
+	std::string civil = Poco::trim(str);
+	std::optional<int> explicitOffset;
+	static const Poco::RegularExpression numericZone(
+		R"([Tt\s]\d{2}(?::?\d{2})?(?::?\d{2}(?:[.,]\d+)?)?\s*([+-])(\d{2})(?::?(\d{2}))?$)");
+	Poco::RegularExpression::MatchVec parts;
+	if (!civil.empty() && (civil.back() == 'Z' || civil.back() == 'z'))
+	{
+		explicitOffset = 0;
+		civil.pop_back();
+	}
+	else if (numericZone.match(civil, 0, parts) > 0)
+	{
+		const int hours = std::stoi(civil.substr(parts[2].offset, 2));
+		const int minutes = parts.size() > 3 ? std::stoi(civil.substr(parts[3].offset, 2)) : 0;
+		if (hours > 23 || minutes > 59)
+			return std::nullopt;
+		const int sign = civil[parts[1].offset] == '-' ? -1 : 1;
+		explicitOffset = sign * (hours * 3600 + minutes * 60);
+		civil.erase(parts[1].offset);
+	}
+#endif
+	// LM4FBS END
 	Poco::DateTime dt;
 	for (const auto& fmt : formats)
 	{
 		try
 		{
 			int tz = 0;
+			// LM4FBS BEGIN — Honor an explicit zone, or resolve the local civil time.
+			// Poco::DateTimeParser::parse(fmt, str, dt, tz);
+			// dt.makeUTC((str.find_first_of("zZ+") != std::string::npos) ? tz : Poco::Timezone::tzd());
+			// LM4FBS REPLACEMENT
+#ifdef __FreeBSD__
+			Poco::DateTimeParser::parse(fmt, civil, dt, tz);
+			if (!explicitOffset)
+				return localFilterTimestamp(dt);
+			dt.makeUTC(*explicitOffset);
+#else
 			Poco::DateTimeParser::parse(fmt, str, dt, tz);
 			dt.makeUTC((str.find_first_of("zZ+") != std::string::npos) ? tz : Poco::Timezone::tzd());
+#endif
+			// LM4FBS END
 			return dt.timestamp();
 		}
 		catch (Poco::SyntaxException&)
@@ -1069,7 +1147,15 @@ static auto DateStrField(int index, const FilterEvalContext& ectxt) -> ValueType
 {
 	if (!ectxt.di->diffcode.exists(index))
 		return std::monostate{};
+	// LM4FBS BEGIN — Format the file's timestamp in its historical local time.
+	// Poco::LocalDateTime ldt(Poco::Timezone::tzd(), ectxt.di->diffFileInfo[index].mtime);
+	// LM4FBS REPLACEMENT
+#ifdef __FreeBSD__
+	auto ldt = filterLocalDateTime(ectxt.di->diffFileInfo[index].mtime);
+#else
 	Poco::LocalDateTime ldt(Poco::Timezone::tzd(), ectxt.di->diffFileInfo[index].mtime);
+#endif
+	// LM4FBS END
 	return Poco::DateTimeFormatter::format(ldt, "%Y-%m-%d");
 }
 
@@ -1683,10 +1769,24 @@ ValueType FieldNode::Evaluate(const FilterEvalContext& ectxt) const
 
 inline static std::optional<Poco::LocalDateTime> toLocalDateTime(const ValueType& val)
 {
+	// LM4FBS BEGIN — Calendar functions use the offset of their input instant.
+	// if (auto ts = std::get_if<Poco::Timestamp>(&val))
+	// 	return Poco::LocalDateTime(*ts);
+	// if (auto str = std::get_if<std::string>(&val))
+	// 	return Poco::LocalDateTime(DateTimeLiteral(*str).value);
+	// LM4FBS REPLACEMENT
+#ifdef __FreeBSD__
+	if (auto ts = std::get_if<Poco::Timestamp>(&val))
+		return filterLocalDateTime(*ts);
+	if (auto str = std::get_if<std::string>(&val))
+		return filterLocalDateTime(DateTimeLiteral(*str).value);
+#else
 	if (auto ts = std::get_if<Poco::Timestamp>(&val))
 		return Poco::LocalDateTime(*ts);
 	if (auto str = std::get_if<std::string>(&val))
 		return Poco::LocalDateTime(DateTimeLiteral(*str).value);
+#endif
+	// LM4FBS END
 	return std::nullopt;
 }
 
@@ -2107,10 +2207,22 @@ static auto StartOfWeekFunc(const FilterEvalContext& ectxt, std::vector<ExprNode
 			auto ldtOpt = toLocalDateTime(val);
 			if (!ldtOpt) return std::monostate{};
 			auto& ldt = *ldtOpt;
+			// LM4FBS BEGIN — Count back by calendar days before resolving Sunday midnight.
+			// Poco::LocalDateTime startOfDay(ldt.year(), ldt.month(), ldt.day(), 0, 0, 0, 0, 0);
+			// int dow = ldt.dayOfWeek();
+			// Poco::Timespan offset(dow, 0, 0, 0, 0);
+			// return (startOfDay - offset).utc().timestamp();
+			// LM4FBS REPLACEMENT
+#ifdef __FreeBSD__
+			const Poco::DateTime day(ldt.year(), ldt.month(), ldt.day());
+			return localFilterTimestamp(day - Poco::Timespan(day.dayOfWeek(), 0, 0, 0, 0));
+#else
 			Poco::LocalDateTime startOfDay(ldt.year(), ldt.month(), ldt.day(), 0, 0, 0, 0, 0);
 			int dow = ldt.dayOfWeek();
 			Poco::Timespan offset(dow, 0, 0, 0, 0);
 			return (startOfDay - offset).utc().timestamp();
+#endif
+			// LM4FBS END
 		};
 	auto arg = (*args)[0]->Evaluate(ectxt);
 	return applyToScalarOrArray(arg, startOfWeek);
@@ -2123,7 +2235,15 @@ static auto StartOfMonthFunc(const FilterEvalContext& ectxt, std::vector<ExprNod
 			auto ldtOpt = toLocalDateTime(val);
 			if (!ldtOpt) return std::monostate{};
 			auto& ldt = *ldtOpt;
+			// LM4FBS BEGIN
+			// return Poco::LocalDateTime(ldt.year(), ldt.month(), 1, 0, 0, 0, 0, 0).utc().timestamp();
+			// LM4FBS REPLACEMENT
+#ifdef __FreeBSD__
+			return localFilterTimestamp(Poco::DateTime(ldt.year(), ldt.month(), 1));
+#else
 			return Poco::LocalDateTime(ldt.year(), ldt.month(), 1, 0, 0, 0, 0, 0).utc().timestamp();
+#endif
+			// LM4FBS END
 		};
 	auto arg = (*args)[0]->Evaluate(ectxt);
 	return applyToScalarOrArray(arg, startOfMonth);
@@ -2136,7 +2256,15 @@ static auto StartOfYearFunc(const FilterEvalContext& ectxt, std::vector<ExprNode
 			auto ldtOpt = toLocalDateTime(val);
 			if (!ldtOpt) return std::monostate{};
 			auto& ldt = *ldtOpt;
+			// LM4FBS BEGIN
+			// return Poco::LocalDateTime(ldt.year(), 1, 1, 0, 0, 0, 0, 0).utc().timestamp();
+			// LM4FBS REPLACEMENT
+#ifdef __FreeBSD__
+			return localFilterTimestamp(Poco::DateTime(ldt.year(), 1, 1));
+#else
 			return Poco::LocalDateTime(ldt.year(), 1, 1, 0, 0, 0, 0, 0).utc().timestamp();
+#endif
+			// LM4FBS END
 		};
 	auto arg = (*args)[0]->Evaluate(ectxt);
 	return applyToScalarOrArray(arg, startOfYear);

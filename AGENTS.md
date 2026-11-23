@@ -55,13 +55,19 @@ Keep the `FreeBSD` workflow (`.github/workflows/freebsd.yml`) enabled for this f
 
 The initial FreeBSD changes date from November 23, 2026. The fork starts at upstream commit `7ae6fb9e3e306729675745f4fc7add809c57fda7`, 15 commits after `v1.5.0`. Its validation target is FreeBSD 15.1-RELEASE on amd64. The fork’s FreeBSD workflow builds with base Clang and `/usr/bin/make` as a regular user, installs into `/usr/local` as root, and exercises the installed program as the regular user.
 
-Keep coverage for two FreeBSD behaviors when integrating upstream changes. The engine locates its executable through `KERN_PROC_PATHNAME`, including when procfs is unmounted. Folder operations can use the desktop Trash on a fresh account, and an overwritten file must remain recoverable with its original contents. The workflow also opens file and folder comparisons on a virtual X11 display and checks a saved merge and its backup against the expected bytes.
+Keep coverage for the following FreeBSD behaviors when integrating upstream changes.
+
+- The engine locates its executable through `KERN_PROC_PATHNAME`, including when procfs is unmounted.
+- Folder operations can use the desktop Trash on a fresh account. An overwritten file must remain recoverable with its original contents.
+- Filters interpret local dates using the time zone and daylight-saving offset for the date being compared. Preserve coverage for dates on both sides of a daylight-saving change.
+
+Build and install once in the VM. Run the complete CTest suite, the installed application’s self-tests, and the virtual X11 checks in both `UTC` and `Europe/Madrid`, with fresh XDG settings and data for each zone. The X11 checks open file and folder comparisons and verify a saved merge and its backup against the expected bytes.
 
 ### Keeping the README in sync
 
 Maintain the FreeBSD notice at the top of `README.md`, including the programming credit from “Purpose and name” and the full, clickable upstream project URL. Keep FreeBSD-specific README edits in that notice. Preserve the visible space before the first horizontal rule (`---`) and the blank line after it.
 
-Keep the notice’s FreeBSD installation instructions in step with the commands verified in the VM, including dependency packages, cloning this fork, building, running CTest, and installing with `make install`.
+Keep the notice’s FreeBSD installation instructions in step with the commands verified in the VM, including dependency packages, cloning this fork, building, and installing with `make install`. Maintain a separate **Update on FreeBSD** section for an existing clone. Specify the starting directory, how to pull and rebuild as a regular user, and how to reinstall with root privileges. Give automated testing its own optional section after the installation and update instructions. Explain what CTest checks, where to run it, how to see failure output, and where to find the full test log.
 
 When integrating an upstream tag or commit, copy the complete `README.md` from that exact revision below the divider. Verify that the text after the divider and its blank line matches the upstream file byte for byte.
 
