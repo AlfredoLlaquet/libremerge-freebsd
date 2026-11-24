@@ -11,7 +11,7 @@ Both packages are for **amd64** (64-bit Intel or AMD). Choose the package for yo
 | Package | Built on | Fresh installation and upgrade tested on |
 | --- | --- | --- |
 | FreeBSD 14 amd64 | 14.4-RELEASE | 14.4-RELEASE and 14.5-RELEASE |
-| FreeBSD 15 amd64 | 15.1-RELEASE | 15.1-RELEASE |
+| FreeBSD 15 amd64 | 15.1-RELEASE-p6 | 15.1-RELEASE-p6 |
 
 The native FreeBSD workflow records the exact userland and kernel patch levels in each successful run. The earlier source release also passed its build, application and graphical tests on **FreeBSD 15.1-RELEASE-p6 (amd64)**. [FreeBSD test runs](https://github.com/AlfredoLlaquet/libremerge-freebsd/actions/workflows/freebsd.yml) · [Earlier source test results](https://github.com/AlfredoLlaquet/libremerge-freebsd/actions/runs/45171753107)
 

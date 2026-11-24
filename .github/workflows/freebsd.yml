@@ -33,7 +33,7 @@ jobs:
           run: sh packaging/freebsd/build-packages.sh
       - name: Record the build system
         run: |
-          echo "Built and tested on $(cat out/userland.txt) (amd64), running kernel $(cat out/kernel.txt)." >> "$GITHUB_STEP_SUMMARY"
+          echo "Built and tested on $(cat out/userland.txt) (amd64), running kernel $(cat out/kernel.txt)." | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: build-FreeBSD-${{ matrix.major }}-amd64
@@ -72,7 +72,7 @@ jobs:
             freebsd-version -r > tested-kernel.txt
       - name: Record the installed package test
         run: |
-          echo "Fresh installation and upgrade passed on $(cat tested-userland.txt) (amd64), running kernel $(cat tested-kernel.txt)." >> "$GITHUB_STEP_SUMMARY"
+          echo "Fresh installation and upgrade passed on $(cat tested-userland.txt) (amd64), running kernel $(cat tested-kernel.txt)." | tee -a "$GITHUB_STEP_SUMMARY"
 
   downloads:
     name: Assemble tested downloads
