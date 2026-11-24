@@ -4,24 +4,9 @@ This repository contains the source for an independently maintained FreeBSD port
 
 Programmed by **ChatGPT** for Alfredo Llaquet-Alsina.
 
-## FreeBSD compatibility
-
-Both packages are for **amd64** (64-bit Intel or AMD). Choose the package for your FreeBSD major version.
-
-| Package | Built on | Fresh installation and upgrade tested on |
-| --- | --- | --- |
-| FreeBSD 14 amd64 | 14.4-RELEASE | 14.4-RELEASE and 14.5-RELEASE |
-| FreeBSD 15 amd64 | 15.1-RELEASE-p6 | 15.1-RELEASE-p6 |
-
-The native FreeBSD workflow records the exact userland and kernel patch levels in each successful run. The earlier source release also passed its build, application and graphical tests on **FreeBSD 15.1-RELEASE-p6 (amd64)**. [FreeBSD test runs](https://github.com/AlfredoLlaquet/libremerge-freebsd/actions/workflows/freebsd.yml) · [Earlier source test results](https://github.com/AlfredoLlaquet/libremerge-freebsd/actions/runs/45171753107)
-
-**Expected compatibility.** Later patch levels of the releases above and later minor releases in the same major series on amd64 should work when compatible versions of Qt and the other runtime libraries are available. These versions have not been tested individually. A later 14.x release would use the FreeBSD 14 package.
-
 ## Install from the FreeBSD package
 
-For a **development build**, open the latest successful [FreeBSD run on development](https://github.com/AlfredoLlaquet/libremerge-freebsd/actions/workflows/freebsd.yml?query=branch%3Adevelopment+is%3Asuccess). While signed in to GitHub, download the individual `.pkg` for your major version under **Artifacts**. For a **published release**, use the package links in the table. Each release also includes `SHA256SUMS` and the corresponding source.
-
-Open a **root shell** in the directory containing the downloaded package and run the command for your system.
+Download the package for your version of FreeBSD. Open a **root shell** in the directory where you saved it and run the matching command below.
 
 | Release download | Install command for revision 3 |
 | --- | --- |
@@ -70,11 +55,10 @@ These steps build LibreMerge with the base system’s Clang and `make` and insta
 
 ## Update on FreeBSD from source
 
-As your regular user, open a terminal in the **top level of your existing clone** (the `libremerge-freebsd` directory containing `CMakeLists.txt`). On the `main` branch, pull the latest changes and rebuild using the same `build` directory.
+As your regular user, open a terminal in the **top level of your existing clone** (the `libremerge-freebsd` directory containing `CMakeLists.txt`). Pull the latest changes and rebuild using the same `build` directory.
 
 ```sh
-git switch main
-git pull --ff-only origin main
+git pull --ff-only
 cmake -S . -B build -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make \
     -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
 cd build
@@ -96,6 +80,17 @@ ctest --output-on-failure
 ```
 
 CTest prints the name and output of each failed test. The full log for the most recent run is `Testing/Temporary/LastTest.log`, relative to the build directory.
+
+## FreeBSD compatibility
+
+Both packages are for **amd64** (64-bit Intel or AMD). Choose the package for your FreeBSD major version.
+
+| Package | Built on | Fresh installation and upgrade tested on |
+| --- | --- | --- |
+| FreeBSD 14 amd64 | 14.4-RELEASE | 14.4-RELEASE and 14.5-RELEASE |
+| FreeBSD 15 amd64 | 15.1-RELEASE-p6 | 15.1-RELEASE-p6 |
+
+**Expected compatibility.** Later patch levels of the releases above and later minor releases in the same major series on amd64 should work when compatible versions of Qt and the other runtime libraries are available. These versions have not been tested individually. A later 14.x release would use the FreeBSD 14 package.
 
 <br>
 

@@ -71,7 +71,11 @@ In separate fresh VMs, install the actual candidate with `pkg install ./filename
 
 Maintain the FreeBSD notice at the top of `README.md`, including the programming credit from “Purpose and name” and the full, clickable upstream project URL. Keep FreeBSD-specific README edits in that notice. Preserve the visible space before the first horizontal rule (`---`) and the blank line after it.
 
+Write the notice for people installing, updating, and using LibreMerge. Link directly to the published packages and leave the default branch implicit, including in the source update command (`git pull --ff-only`). Give Alfredo any development downloads, GitHub sign-in instructions, and workflow links in the testing handoff. Keep historical test results in their release notes.
+
 Maintain separate package installation and package update sections, with the right download and filename for each major ABI. Keep source installation and source update instructions in step with the commands verified in the VM, including dependencies, cloning this fork, building as a regular user, and installing with `make install` with root privileges. Specify the starting directory for rebuilding an existing clone. Give automated testing its own optional section after the installation and update instructions. Explain what CTest checks, where to run it, how to see failure output, and where to find the full test log.
+
+Place **FreeBSD compatibility** last, after the optional tests and before Alfredo’s author paragraph. Follow the table of tested versions immediately with the expected compatibility for untested versions.
 
 Keep Alfredo’s author paragraph verbatim immediately before the paragraph explaining the divider. Use a third-level heading, a working link to https://www.thecrumbs.org/, and extra vertical space above and below it.
 
