@@ -7,88 +7,95 @@ permissions:
   contents: read
 
 jobs:
-  freebsd:
-    name: Build, install and test on FreeBSD 15.1 amd64
+  build:
+    name: Build and test on FreeBSD ${{ matrix.release }} amd64
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 110
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { release: '14.4', major: '14' }
+          - { release: '15.1', major: '15' }
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
       - uses: vmactions/freebsd-vm@811efaaac0668df8bfb8308c3ec997b5ab50037b # v1.6.0
         with:
-          release: '15.1'
-          sync: 'no'
-          envs: 'GITHUB_SHA GITHUB_REF'
+          release: ${{ matrix.release }}
+          sync: rsync
+          envs: GITHUB_SHA
           prepare: |
             pkg install -y git cmake qt6-base qt6-svg qt6-imageformats qt6-translations \
-              poco boost-libs icu re2c lemon googletest
+              poco boost-libs icu re2c lemon googletest python3
+          run: sh packaging/freebsd/build-packages.sh
+      - name: Record the build system
+        run: |
+          echo "Built and tested on $(cat out/userland.txt) (amd64), running kernel $(cat out/kernel.txt)." >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: build-FreeBSD-${{ matrix.major }}-amd64
+          path: out/
+          compression-level: 0
+          if-no-files-found: error
+
+  install:
+    name: Clean install and upgrade on FreeBSD ${{ matrix.release }} amd64
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { release: '14.4', major: '14' }
+          - { release: '14.5', major: '14' }
+          - { release: '15.1', major: '15' }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: build-FreeBSD-${{ matrix.major }}-amd64
+          path: packages
+      - uses: vmactions/freebsd-vm@811efaaac0668df8bfb8308c3ec997b5ab50037b # v1.6.0
+        with:
+          release: ${{ matrix.release }}
+          sync: rsync
           run: |
             set -eu
-            uname -a
-            pw useradd -n lmbuild -m -s /bin/sh
-            cd /home/lmbuild
-            su lmbuild -c 'git clone https://github.com/AlfredoLlaquet/libremerge-freebsd.git'
-            cd libremerge-freebsd
-            su lmbuild -c '
-              set -eu
-              git fetch origin "$GITHUB_REF"
-              git checkout --detach "$GITHUB_SHA"
-              cmake -S . -B build -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make \
-                -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
-              cd build
-              make -j2
-            '
-            (cd build && su root -c 'make install')
+            sh packaging/freebsd/check-package.sh
+            freebsd-version -u > tested-userland.txt
+            freebsd-version -r > tested-kernel.txt
+      - name: Record the installed package test
+        run: |
+          echo "Fresh installation and upgrade passed on $(cat tested-userland.txt) (amd64), running kernel $(cat tested-kernel.txt)." >> "$GITHUB_STEP_SUMMARY"
 
-            pkg install -y bash xorg-vfbserver dejavu
-            failed=0
-            for zone in UTC Europe/Madrid; do
-              printf '\nRunning FreeBSD tests in %s\n' "$zone"
-              su lmbuild -c "TZ=$zone sh -s" <<'GUI_TESTS' || failed=1
-            set -eu
-            app=/usr/local/bin/libremerge
-            test -x "$app"
-            test -r /usr/local/share/applications/libremerge.desktop
-            test -x /usr/local/share/kio/servicemenus/libremerge.desktop
-            work=$(mktemp -d)
-            trap 'rm -rf "$work"' EXIT
-            export XDG_CONFIG_HOME="$work/config" XDG_DATA_HOME="$work/data"
-            export XDG_CACHE_HOME="$work/cache" XDG_STATE_HOME="$work/state"
-            export XDG_RUNTIME_DIR="$work/runtime" LC_ALL=en_US.UTF-8
-            mkdir -m 700 "$XDG_RUNTIME_DIR"
-            # Exercise the first use of Trash in a fresh XDG data directory.
-            test ! -d "$XDG_DATA_HOME"
-            QT_QPA_PLATFORM=offscreen "$app" --selftest-folder3-ops
-            test -s "$XDG_DATA_HOME/Trash/info/a.txt.trashinfo"
-            printf '1\n' | cmp - "$XDG_DATA_HOME/Trash/files/a.txt"
-            ctest --test-dir build --output-on-failure --no-tests=error
-            QT_QPA_PLATFORM=offscreen bash packaging/run_selftests.sh "$app"
-
-            Xvfb -screen 0 1280x900x24 -nolisten tcp -displayfd 1 > "$work/display" &
-            server=$!
-            trap 'kill "$server" 2>/dev/null || true; rm -rf "$work"' EXIT
-            for attempt in $(jot 30); do
-              [ ! -s "$work/display" ] || break
-              kill -0 "$server"
-              sleep 1
-            done
-            test -s "$work/display"
-            export DISPLAY=":$(cat "$work/display")" QT_QPA_PLATFORM=xcb
-            mkdir "$work/left" "$work/right"
-            printf 'first\nleft\nlast\n' > "$work/left/example.txt"
-            printf 'first\nright\nlast\n' > "$work/right/example.txt"
-            cp "$work/right/example.txt" "$work/before.txt"
-            "$app" --screenshot "$work/files.png" "$work/left/example.txt" "$work/right/example.txt"
-            "$app" --screenshot "$work/folders.png" "$work/left" "$work/right"
-            test -s "$work/files.png"
-            test -s "$work/folders.png"
-            "$app" --selftest-folder-sync
-            status=0
-            "$app" -noninteractive -enableexitcode -noprefs "$work/left/example.txt" "$work/right/example.txt" || status=$?
-            test "$status" -eq 1
-            "$app" --selftest-save "$work/left/example.txt" "$work/right/example.txt"
-            cmp "$work/left/example.txt" "$work/right/example.txt"
-            cmp "$work/before.txt" "$work/right/example.txt.bak"
-            "$app" -noninteractive -enableexitcode -noprefs "$work/left/example.txt" "$work/right/example.txt"
-            GUI_TESTS
-            done
-            exit "$failed"
+  downloads:
+    name: Assemble tested downloads
+    needs: install
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: build-FreeBSD-*-amd64
+          path: builds
+      - name: Collect both packages and their corresponding source
+        run: |
+          mkdir release
+          cp builds/build-FreeBSD-14-amd64/release/*-FreeBSD-14-amd64.pkg release/
+          cp builds/build-FreeBSD-15-amd64/release/*-FreeBSD-15-amd64.pkg release/
+          cp builds/build-FreeBSD-15-amd64/release/*-source.tar.gz release/
+          cd release
+          sha256sum *.pkg *-source.tar.gz > SHA256SUMS
+          sha256sum -c SHA256SUMS
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: libremerge-FreeBSD-amd64
+          path: release/
+          compression-level: 0
+          if-no-files-found: error
 # LM4FBS END

@@ -4,9 +4,39 @@ This repository contains the source for an independently maintained FreeBSD port
 
 Programmed by **ChatGPT** for Alfredo Llaquet-Alsina.
 
-## Install on FreeBSD
+## FreeBSD compatibility
 
-Tested on FreeBSD 15.1-RELEASE-p6 (amd64) with the base system’s Clang and `make`. These steps install LibreMerge under `/usr/local`.
+Both packages are for **amd64** (64-bit Intel or AMD). Choose the package for your FreeBSD major version.
+
+| Package | Built on | Fresh installation and upgrade tested on |
+| --- | --- | --- |
+| FreeBSD 14 amd64 | 14.4-RELEASE | 14.4-RELEASE and 14.5-RELEASE |
+| FreeBSD 15 amd64 | 15.1-RELEASE | 15.1-RELEASE |
+
+The native FreeBSD workflow records the exact userland and kernel patch levels in each successful run. The earlier source release also passed its build, application and graphical tests on **FreeBSD 15.1-RELEASE-p6 (amd64)**. [FreeBSD test runs](https://github.com/AlfredoLlaquet/libremerge-freebsd/actions/workflows/freebsd.yml) · [Earlier source test results](https://github.com/AlfredoLlaquet/libremerge-freebsd/actions/runs/45171753107)
+
+**Expected to work, still untested:** later patch levels of the releases above and later minor releases in the same major series on amd64, with compatible versions of Qt and the other runtime libraries available. For example, a later 14.x release would use the FreeBSD 14 package.
+
+## Install from the FreeBSD package
+
+Download the `.pkg` for your major version from [this fork’s releases](https://github.com/AlfredoLlaquet/libremerge-freebsd/releases). To try a development build before publication, open the latest successful [FreeBSD run on development](https://github.com/AlfredoLlaquet/libremerge-freebsd/actions/workflows/freebsd.yml?query=branch%3Adevelopment+is%3Asuccess), download **libremerge-FreeBSD-amd64** under **Artifacts**, and unzip it.
+
+Open a **root shell** in the directory containing the downloaded package and run the command for your system.
+
+| System | Install command for revision 3 |
+| --- | --- |
+| FreeBSD 14 amd64 | `pkg install ./libremerge-1.5.0_3-FreeBSD-14-amd64.pkg` |
+| FreeBSD 15 amd64 | `pkg install ./libremerge-1.5.0_3-FreeBSD-15-amd64.pkg` |
+
+The `./` selects the local file. `pkg` fetches any missing runtime dependencies from your configured FreeBSD repositories. Open **LibreMerge** from your desktop’s applications menu, or run `libremerge` in a terminal as your regular user.
+
+## Update from the FreeBSD package
+
+Close LibreMerge and download the newer `.pkg` for your FreeBSD major version from [the releases page](https://github.com/AlfredoLlaquet/libremerge-freebsd/releases). In a root shell in the download directory, run `pkg install ./` followed immediately by the **new filename**, just as in the table above. The command upgrades the installed copy. Run `pkg info libremerge` to see the installed package version, then reopen LibreMerge.
+
+## Install on FreeBSD from source
+
+These steps build LibreMerge with the base system’s Clang and `make` and install it under `/usr/local`.
 
 1. In a root shell, install the dependencies.
 
@@ -38,7 +68,7 @@ Tested on FreeBSD 15.1-RELEASE-p6 (amd64) with the base system’s Clang and `ma
    libremerge
    ```
 
-## Update on FreeBSD
+## Update on FreeBSD from source
 
 As your regular user, open a terminal in the **top level of your existing clone** (the `libremerge-freebsd` directory containing `CMakeLists.txt`). On the `main` branch, pull the latest changes and rebuild using the same `build` directory.
 
@@ -66,6 +96,12 @@ ctest --output-on-failure
 ```
 
 CTest prints the name and output of each failed test. The full log for the most recent run is `Testing/Temporary/LastTest.log`, relative to the build directory.
+
+<br>
+
+### Alfredo Llaquet-Alsina is not only a FreeBSD enthusiast, but also a writer. Please visit [www.TheCrumbs.org](https://www.thecrumbs.org/) and take a look at his work, free for everyone.
+
+<br>
 
 Everything below the horizontal rule is the upstream LibreMerge README, reproduced verbatim from the revision used by this fork. Its download and installation instructions describe the upstream macOS and Linux releases.
 
