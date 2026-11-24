@@ -81,7 +81,7 @@ ctest --output-on-failure
 
 CTest prints the name and output of each failed test. The full log for the most recent run is `Testing/Temporary/LastTest.log`, relative to the build directory.
 
-## FreeBSD compatibility
+## Compatibility
 
 Both packages are for **amd64** (64-bit Intel or AMD). Choose the package for your FreeBSD major version.
 
