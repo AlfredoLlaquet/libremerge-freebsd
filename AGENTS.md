@@ -45,7 +45,7 @@ The commented original must match the upstream revision currently used by this f
 
 ## Following LibreMerge releases
 
-Use the long-lived `development` branch for all changes. Start from the current `main`, integrate later changes from `main` when needed, and keep the branch after merging. Give Alfredo the development README, the successful FreeBSD run, and its tested package downloads for review. Merge the reviewed commit to `main` after Alfredo approves. A push to either branch may build artifacts. Publishing a release is a separate, authorized step.
+Since November 24, 2026, all changes start on the long-lived `development` branch. Bring it up to date with `main` when needed, test the changes there, and keep the branch after merging. Tailor checks to the change. For package releases, give Alfredo the development README, the successful FreeBSD run, and the individual package downloads for review. Merge the reviewed commit to `main` after Alfredo approves. Publishing a release is a separate, authorized step.
 
 1. Use `origin` for this fork and `upstream` for `iagodpassos/libremerge`. For each new stable LibreMerge release, fetch its tag and merge it into the fork. Resolve conflicts here and review which FreeBSD patches are still needed.
 2. Before publishing, build and test the merged version in a **FreeBSD virtual machine**. Run the existing CTest suite and application self-tests. Verify that the Qt application launches, compares files and folders, and saves a merge result. Fix FreeBSD regressions in this fork.

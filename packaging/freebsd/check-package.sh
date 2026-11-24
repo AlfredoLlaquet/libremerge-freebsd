@@ -16,7 +16,7 @@ fi
 cd packages/release
 pkg install -y "./$candidate"
 test "$(pkg query '%v' libremerge)" = "$package_version"
-pkg check -ds libremerge
+pkg check -dns libremerge
 su lmtest -c 'QT_QPA_PLATFORM=offscreen /usr/local/bin/libremerge --version'
 
 pkg delete -y libremerge
@@ -24,12 +24,12 @@ test ! -e /usr/local/bin/libremerge
 cd ../previous
 pkg install -y "./$previous"
 test "$(pkg query '%v' libremerge)" = "$previous_version"
-su lmtest -c 'mkdir -p ~/.config/libremerge && echo "keep my settings" > ~/.config/libremerge/upgrade-test'
+su lmtest -c 'mkdir -p ~/.config/LibreMerge && printf "[Appearance]\nTheme=dark\n" > ~/.config/LibreMerge/LibreMerge.conf'
 cd ../release
 pkg install -y "./$candidate"
 test "$(pkg query '%v' libremerge)" = "$package_version"
-su lmtest -c 'test "$(cat ~/.config/libremerge/upgrade-test)" = "keep my settings"'
-pkg check -ds libremerge
+su lmtest -c 'printf "[Appearance]\nTheme=dark\n" | cmp - ~/.config/LibreMerge/LibreMerge.conf'
+pkg check -dns libremerge
 
 pkg install -y bash xorg-vfbserver dejavu
 su lmtest -c "sh '$scripts/check-installed.sh' '$selftests'"

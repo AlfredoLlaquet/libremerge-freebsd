@@ -15,18 +15,18 @@ Both packages are for **amd64** (64-bit Intel or AMD). Choose the package for yo
 
 The native FreeBSD workflow records the exact userland and kernel patch levels in each successful run. The earlier source release also passed its build, application and graphical tests on **FreeBSD 15.1-RELEASE-p6 (amd64)**. [FreeBSD test runs](https://github.com/AlfredoLlaquet/libremerge-freebsd/actions/workflows/freebsd.yml) · [Earlier source test results](https://github.com/AlfredoLlaquet/libremerge-freebsd/actions/runs/45171753107)
 
-**Expected to work, still untested:** later patch levels of the releases above and later minor releases in the same major series on amd64, with compatible versions of Qt and the other runtime libraries available. For example, a later 14.x release would use the FreeBSD 14 package.
+**Expected compatibility.** Later patch levels of the releases above and later minor releases in the same major series on amd64 should work when compatible versions of Qt and the other runtime libraries are available. These versions have not been tested individually. A later 14.x release would use the FreeBSD 14 package.
 
 ## Install from the FreeBSD package
 
-Download the `.pkg` for your major version from [this fork’s releases](https://github.com/AlfredoLlaquet/libremerge-freebsd/releases). To try a development build before publication, open the latest successful [FreeBSD run on development](https://github.com/AlfredoLlaquet/libremerge-freebsd/actions/workflows/freebsd.yml?query=branch%3Adevelopment+is%3Asuccess), download **libremerge-FreeBSD-amd64** under **Artifacts**, and unzip it.
+For a **development build**, open the latest successful [FreeBSD run on development](https://github.com/AlfredoLlaquet/libremerge-freebsd/actions/workflows/freebsd.yml?query=branch%3Adevelopment+is%3Asuccess). While signed in to GitHub, download the individual `.pkg` for your major version under **Artifacts**. For a **published release**, use the package links in the table. Each release also includes `SHA256SUMS` and the corresponding source.
 
 Open a **root shell** in the directory containing the downloaded package and run the command for your system.
 
-| System | Install command for revision 3 |
+| Release download | Install command for revision 3 |
 | --- | --- |
-| FreeBSD 14 amd64 | `pkg install ./libremerge-1.5.0_3-FreeBSD-14-amd64.pkg` |
-| FreeBSD 15 amd64 | `pkg install ./libremerge-1.5.0_3-FreeBSD-15-amd64.pkg` |
+| [FreeBSD 14 amd64 package](https://github.com/AlfredoLlaquet/libremerge-freebsd/releases/download/v1.5.0-freebsd.3/libremerge-1.5.0_3-FreeBSD-14-amd64.pkg) | `pkg install ./libremerge-1.5.0_3-FreeBSD-14-amd64.pkg` |
+| [FreeBSD 15 amd64 package](https://github.com/AlfredoLlaquet/libremerge-freebsd/releases/download/v1.5.0-freebsd.3/libremerge-1.5.0_3-FreeBSD-15-amd64.pkg) | `pkg install ./libremerge-1.5.0_3-FreeBSD-15-amd64.pkg` |
 
 The `./` selects the local file. `pkg` fetches any missing runtime dependencies from your configured FreeBSD repositories. Open **LibreMerge** from your desktop’s applications menu, or run `libremerge` in a terminal as your regular user.
 
