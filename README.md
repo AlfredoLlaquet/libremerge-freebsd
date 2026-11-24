@@ -4,7 +4,7 @@ This repository contains the source, packaged binaries, and installation instruc
 
 Programmed by **ChatGPT** for Alfredo Llaquet-Alsina.
 
-## Install from the FreeBSD package
+## Install from a FreeBSD package
 
 Download the package for your version of FreeBSD. Open a **root shell** in the directory where you saved it and run the matching command below.
 
