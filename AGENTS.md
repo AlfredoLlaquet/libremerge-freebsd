@@ -73,7 +73,7 @@ Maintain the FreeBSD notice at the top of `README.md`. Its opening paragraph int
 
 Write the notice for people installing, updating, and using LibreMerge. Link directly to the published packages and leave the default branch implicit, including in the source update command (`git pull --ff-only`). Give Alfredo any development downloads, GitHub sign-in instructions, and workflow links in the testing handoff. Keep historical test results in their release notes.
 
-In **Install from a FreeBSD package**, give the download link and matching install command for each supported FreeBSD major version and architecture. In **Update from the FreeBSD package**, direct readers to both the download table above and the fork’s releases page.
+In **Install from a FreeBSD package**, give the download link and matching install command for each supported FreeBSD major version and architecture. Follow it with **Verify the FreeBSD package**. Keep its direct `SHA256SUMS` link on the same release tag as the package links. In **Update from the FreeBSD package**, direct readers to both the download table above and the fork’s releases page.
 
 Keep source installation and source update instructions in step with the commands verified in the VM, including dependencies, cloning this fork, building as a regular user, and installing with `make install` with root privileges. Specify the starting directory for rebuilding an existing clone. Give automated testing its own optional section after the installation and update instructions. Explain what CTest checks, where to run it, how to see failure output, and where to find the full test log.
 
@@ -99,7 +99,7 @@ For a future ports recipe, `engine/TreeSitterGrammars.cmake` lists the pinned gr
 
 ChatGPT handles the engineering work Alfredo requests, including implementation, builds, testing, upstream release integration, documentation, packaging, and publication of authorized releases. Alfredo provides authorization when a step requires it, performs any additional testing he chooses, and uses the application.
 
-When Alfredo introduces a message with **`Question:`**, answer the question only. Wait for a separate instruction before acting on it.
+When Alfredo asks a question, including a suggested change phrased as a question or a message beginning with **`Question:`**, answer it and wait for a separate instruction before making changes.
 
 ## Keeping this guide current
 

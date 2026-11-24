@@ -6,7 +6,7 @@ Programmed by **ChatGPT** for Alfredo Llaquet-Alsina.
 
 ## Install from a FreeBSD package
 
-Download the package for your version of FreeBSD. Open a **root shell** in the directory where you saved it and run the matching command below.
+Download the package for your version of FreeBSD. You can [verify the download](#verify-the-freebsd-package) before installing it. Open a **root shell** in the directory where you saved it and run the matching command below.
 
 | Release download | Install command for revision 3 |
 | --- | --- |
@@ -14,6 +14,16 @@ Download the package for your version of FreeBSD. Open a **root shell** in the d
 | [FreeBSD 15 amd64 package](https://github.com/AlfredoLlaquet/libremerge-freebsd/releases/download/v1.5.0-freebsd.3/libremerge-1.5.0_3-FreeBSD-15-amd64.pkg) | `pkg install ./libremerge-1.5.0_3-FreeBSD-15-amd64.pkg` |
 
 The `./` selects the local file. `pkg` fetches any missing runtime dependencies from your configured FreeBSD repositories. Open **LibreMerge** from your desktop’s applications menu, or run `libremerge` in a terminal as your regular user.
+
+## Verify the FreeBSD package
+
+Save [SHA256SUMS for revision 3](https://github.com/AlfredoLlaquet/libremerge-freebsd/releases/download/v1.5.0-freebsd.3/SHA256SUMS) in the same directory as your `.pkg` file. Keep both original filenames. Before installing or updating, run this command in that directory as your regular user.
+
+```sh
+sha256sum --ignore-missing -c SHA256SUMS
+```
+
+Look for your package’s exact filename followed by `: OK`. This confirms that the download matches the published checksum. The command skips release files you did not download. If your package shows `FAILED`, download it again and repeat the check. If its name is missing from the output, check the directory, filenames, and release revision before proceeding.
 
 ## Update from the FreeBSD package
 
