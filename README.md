@@ -17,7 +17,7 @@ The `./` selects the local file. `pkg` fetches any missing runtime dependencies 
 
 ## Update from the FreeBSD package
 
-Close LibreMerge and download the newer `.pkg` for your FreeBSD major version from [the releases page](https://github.com/AlfredoLlaquet/libremerge-freebsd/releases). In a root shell in the download directory, run `pkg install ./` followed immediately by the **new filename**, just as in the table above. The command upgrades the installed copy. Run `pkg info libremerge` to see the installed package version, then reopen LibreMerge.
+Close LibreMerge and download the newer `.pkg` for your FreeBSD major version from the above section or [the releases page](https://github.com/AlfredoLlaquet/libremerge-freebsd/releases). In a root shell in the download directory, run `pkg install ./` followed immediately by the **new filename**, just as in the table above. The command upgrades the installed copy. Run `pkg info libremerge` to see the installed package version, then reopen LibreMerge.
 
 ## Install on FreeBSD from source
 
