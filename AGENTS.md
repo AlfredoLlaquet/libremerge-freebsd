@@ -69,13 +69,15 @@ In separate fresh VMs, install the actual candidate with `pkg install ./filename
 
 ### Keeping the README in sync
 
-Maintain the FreeBSD notice at the top of `README.md`, including the programming credit from “Purpose and name” and the full, clickable upstream project URL. Keep FreeBSD-specific README edits in that notice. Preserve the visible space before the first horizontal rule (`---`) and the blank line after it.
+Maintain the FreeBSD notice at the top of `README.md`. Its opening paragraph introduces LibreMerge and its FreeBSD port, names the source, packaged binaries, and installation instructions, and links to the full upstream project URL. Keep the programming credit from “Purpose and name” below that paragraph. Keep FreeBSD-specific README edits in the notice. Preserve the visible space before the first horizontal rule (`---`) and the blank line after it.
 
 Write the notice for people installing, updating, and using LibreMerge. Link directly to the published packages and leave the default branch implicit, including in the source update command (`git pull --ff-only`). Give Alfredo any development downloads, GitHub sign-in instructions, and workflow links in the testing handoff. Keep historical test results in their release notes.
 
-Maintain separate package installation and package update sections, with the right download and filename for each major ABI. Keep source installation and source update instructions in step with the commands verified in the VM, including dependencies, cloning this fork, building as a regular user, and installing with `make install` with root privileges. Specify the starting directory for rebuilding an existing clone. Give automated testing its own optional section after the installation and update instructions. Explain what CTest checks, where to run it, how to see failure output, and where to find the full test log.
+In **Install from a FreeBSD package**, give the download link and matching install command for each supported FreeBSD major version and architecture. In **Update from the FreeBSD package**, direct readers to both the download table above and the fork’s releases page.
 
-Place **FreeBSD compatibility** last, after the optional tests and before Alfredo’s author paragraph. Follow the table of tested versions immediately with the expected compatibility for untested versions.
+Keep source installation and source update instructions in step with the commands verified in the VM, including dependencies, cloning this fork, building as a regular user, and installing with `make install` with root privileges. Specify the starting directory for rebuilding an existing clone. Give automated testing its own optional section after the installation and update instructions. Explain what CTest checks, where to run it, how to see failure output, and where to find the full test log.
+
+Place **Compatibility** last, after the optional tests and before Alfredo’s author paragraph. Follow the table of tested versions immediately with the expected compatibility for untested versions.
 
 Keep Alfredo’s author paragraph verbatim immediately before the paragraph explaining the divider. Use a third-level heading, a working link to https://www.thecrumbs.org/, and extra vertical space above and below it.
 
