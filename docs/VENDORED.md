@@ -96,6 +96,32 @@ puts WinMerge's own queries for C and C++ in place of the bundled ones:
 `custom_queries`, written by WinMerge's maintainer (the repository states
 no license), kept in `engine/Externals/tree-sitter-grammars/custom_queries`.
 
+<!-- LM4FBS BEGIN ADDITION -->
+## OpenBSD build dependencies
+
+OpenBSD 8.0 ships Poco 1.4.6, which lacks the timestamp API used by the
+engine. Its package set also lacks SQLite's Lemon parser generator. Since
+November 26, 2026, this fork's OpenBSD build uses the Poco Foundation 1.15.4
+and SQLite Lemon 3.54.1 revisions used by LibreMerge's Flatpak build. The
+source URLs and SHA-256 hashes are recorded in
+[`packaging/openbsd/distfiles.list`](../packaging/openbsd/distfiles.list).
+
+CMake builds a private static Foundation using OpenBSD's zlib, PCRE2 and
+utf8proc libraries. The downstream Poco patch selects `poll(2)` and pthreads
+and turns off Poco's Linux-specific thread naming. It also keeps the outer
+project in control of build output and packaging. Lemon and its template
+generate the filter-expression parser during the build. The installed
+application carries the third-party notices in
+`share/doc/libremerge/openbsd-dependencies.txt`.
+
+The OpenBSD source bundle includes these inputs and the grammar archives in
+`distfiles/`. With the bundle unpacked, configuring with
+`-DLM_OPENBSD_DISTFILES="$PWD/distfiles" -DFETCHCONTENT_FULLY_DISCONNECTED=ON`
+uses that directory and checks the pins before building. When updating a
+dependency, update the pin, review the OpenBSD patch and the notices, and
+verify both a fresh source build and an offline ports build.
+<!-- LM4FBS END -->
+
 ## Translations
 
 LibreMerge mirrors WinMerge's interface, so its translations take

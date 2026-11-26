@@ -10,6 +10,15 @@ export QT_QPA_PLATFORM="${QT_QPA_PLATFORM:-offscreen}"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
+# LM4FBS BEGIN ADDITION — OpenBSD ships its base64 decoder as b64decode.
+if ! command -v base64 >/dev/null 2>&1; then
+  base64() {
+    [ "$#" -eq 1 ] && [ "$1" = -d ] || return 2
+    b64decode -r
+  }
+fi
+# LM4FBS END
+
 make_fixtures() {
   awk 'BEGIN{for(i=1;i<=800;i++) print "line " i " common text here"}' \
     > "$TMP/left.txt"
@@ -45,10 +54,19 @@ PNG
 fails=0
 run_one() { # $1 = selftest name, $2/$3[/$4] = files
   make_fixtures
-  if "$BIN" "--$1" "${@:2}" > "$TMP/output.txt" 2>&1; then
-    echo "ok: $1"
+  # LM4FBS BEGIN — Run the suite with the shell shipped by either BSD.
+  #   if "$BIN" "--$1" "${@:2}" > "$TMP/output.txt" 2>&1; then
+  #     echo "ok: $1"
+  #   else
+  #     echo "FAIL: $1 (exit $?)"
+  # LM4FBS REPLACEMENT
+  name=$1
+  shift
+  if "$BIN" "--$name" "$@" > "$TMP/output.txt" 2>&1; then
+    echo "ok: $name"
   else
-    echo "FAIL: $1 (exit $?)"
+    echo "FAIL: $name (exit $?)"
+  # LM4FBS END
     # what it printed, Qt's own messages left out
     grep -v '^qt\.' "$TMP/output.txt" | tail -n 40 | sed 's/^/    /'
     fails=$((fails + 1))

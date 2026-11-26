@@ -1,6 +1,6 @@
-# LibreMerge for FreeBSD
+# LibreMerge for FreeBSD and OpenBSD
 
-This repository contains the source, packaged binaries, and installation instructions for an independently maintained FreeBSD port of LibreMerge, a graphical tool for comparing and merging files and folders. The upstream project is at <https://github.com/iagodpassos/libremerge>.
+LibreMerge is a graphical tool for comparing and merging files and folders. This independently maintained FreeBSD port also supports OpenBSD. This repository provides the source, binary packages, and installation instructions for both systems. The upstream project is at <https://github.com/iagodpassos/libremerge>.
 
 Programmed by **ChatGPT** for Alfredo Llaquet-Alsina.
 
@@ -81,9 +81,53 @@ From that same `build` directory, reinstall with root privileges. The next time 
 su root -c 'make install'
 ```
 
+## Install from an OpenBSD package
+
+The OpenBSD package is built for **OpenBSD 8.0 on amd64**. Run `uname -r` and `machine -a` to check your system. Save `libremerge-1.5.0.tgz` and its accompanying `SHA256` in a directory of their own. As your regular user, verify the package in that directory.
+
+```sh
+sha256 -C SHA256 libremerge-1.5.0.tgz
+```
+
+After the checksum reports `OK`, open a root shell in the same directory and install from it. The command trusts this directory for the fork’s unsigned package and uses your configured OpenBSD mirror for dependencies.
+
+```sh
+env TRUSTED_PKG_PATH="$PWD" PKG_PATH=installpath pkg_add libremerge-1.5.0
+```
+
+Run `libremerge` as your regular user in your graphical session, or open **LibreMerge** from the applications menu. To remove the package later, run `pkg_delete libremerge` as root.
+
+## Install on OpenBSD from source
+
+Use an OpenBSD 8.0 installation with the compiler and X sets. The following commands install under `/usr/local`.
+
+1. In a root shell, install the dependencies.
+
+   ```sh
+   pkg_add git cmake ninja qt6-qtbase qt6-qtsvg qt6-qtimageformats qt6-qttranslations \
+       boost icu4c libarchive re2c gtest pcre2 libutf8proc vulkan-headers
+   ```
+
+2. As your regular user, clone the fork and build it. The first configuration downloads the pinned syntax grammars, Poco Foundation, and SQLite Lemon. The build checks their SHA-256 digests. A matching complete source archive also supports an [offline build](packaging/openbsd/README.md).
+
+   ```sh
+   git clone -b development https://github.com/AlfredoLlaquet/libremerge-freebsd.git
+   cd libremerge-freebsd
+   cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+   cmake --build build --parallel 2
+   ```
+
+3. From the top of the same checkout, install with root privileges. Then start `libremerge` from your regular user’s desktop session.
+
+   ```sh
+   su root -c 'cmake --install build'
+   ```
+
+To update a source installation, run `git pull --ff-only` at the top of your existing checkout, then repeat the configure, build, and install commands. To make a binary package of your own, see [Building the OpenBSD port](packaging/openbsd/README.md).
+
 ## Run the automated tests (optional)
 
-After building, you can run CTest as your regular user from the `libremerge-freebsd/build` directory created in step 2. It checks the comparison engine and image merging, including file and folder comparisons, filters, and how dates are interpreted in your local time zone.
+After building on either system, you can run CTest as your regular user from the `libremerge-freebsd/build` directory. It checks the comparison engine and image merging, including file and folder comparisons, filters, and how dates are interpreted in your local time zone.
 
 ```sh
 ctest --output-on-failure
@@ -93,7 +137,7 @@ CTest prints the name and output of each failed test. The full log for the most 
 
 ## Compatibility
 
-Both packages are for **amd64** (64-bit Intel or AMD). Choose the package for your FreeBSD major version.
+All packages listed here are for **amd64** (64-bit Intel or AMD). Choose the package for your operating system and release.
 
 | Package | Built on | Fresh installation and upgrade tested on |
 | --- | --- | --- |
@@ -101,6 +145,8 @@ Both packages are for **amd64** (64-bit Intel or AMD). Choose the package for yo
 | FreeBSD 15 amd64 | 15.1-RELEASE-p6 | 15.1-RELEASE-p6 |
 
 **Expected compatibility.** Later patch levels of the releases above and later minor releases in the same major series on amd64 should work when compatible versions of Qt and the other runtime libraries are available. These versions have not been tested individually. A later 14.x release would use the FreeBSD 14 package.
+
+The OpenBSD port targets **8.0 amd64**. Each OpenBSD binary package is built for a particular release and architecture.
 
 <br>
 

@@ -18,7 +18,7 @@ std::function<void(const QUrl &)> &openerStandIn()
 namespace lm
 {
 
-// LM4FBS BEGIN — Direct FreeBSD project inquiries to the fork, which has no issue tracker.
+// LM4FBS BEGIN — Direct project inquiries on both BSDs to the fork, which has no issue tracker.
 // QUrl projectPage()
 // {
 // 	return QUrl(QStringLiteral("https://github.com/iagodpassos/libremerge"));
@@ -34,7 +34,7 @@ namespace lm
 // 	return QUrl(QStringLiteral("https://github.com/iagodpassos/libremerge/issues/5"));
 // }
 // LM4FBS REPLACEMENT
-#ifdef Q_OS_FREEBSD
+#if defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
 QUrl projectPage()
 {
 	return QUrl(QStringLiteral("https://github.com/AlfredoLlaquet/libremerge-freebsd"));

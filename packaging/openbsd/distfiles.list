@@ -1,0 +1,5 @@
+# LM4FBS BEGIN ADDITION — filename SHA-256 URL; keep versions in sync with the Flatpak manifest.
+poco-1.15.4.tar.gz d78ff8a2f4f95dc191590e7e61132be12b02fb4e97a02a8a561cae6ad3cb41ba https://codeload.github.com/pocoproject/poco/tar.gz/6a5667f432e1c5fe5591025ab03a2f8df37116b4
+lemon-3.54.1.c 18ae355d4379fed459e81accdda481e3d2a15c543bd148fd83890ecc0a55d0ee https://raw.githubusercontent.com/sqlite/sqlite/version-3.54.1/tool/lemon.c
+lempar-3.54.1.c 72e998c9c61753acd8d3ee8f6b2057269669dae8aa1bb833c01d793f1a341498 https://raw.githubusercontent.com/sqlite/sqlite/version-3.54.1/tool/lempar.c
+# LM4FBS END

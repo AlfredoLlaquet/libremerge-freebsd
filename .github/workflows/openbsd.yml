@@ -1,0 +1,73 @@
+# LM4FBS BEGIN ADDITION
+name: OpenBSD
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Source build and native port on OpenBSD 8.0 amd64
+    if: github.repository == 'AlfredoLlaquet/libremerge-freebsd'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: vmactions/openbsd-vm@f1ca8bc8ecc5b6ef7218e5b914836e067e1546d3 # v1.4.9
+        with:
+          release: '8.0'
+          sync: rsync
+          envs: GITHUB_SHA
+          run: sh packaging/openbsd/ci/build.sh
+      - name: Pass the native package and corresponding source to the clean VM job
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: candidate-OpenBSD-8.0-amd64
+          path: out/
+          if-no-files-found: error
+          compression-level: 0
+
+  install:
+    name: Clean package install and GUI tests on OpenBSD 8.0 amd64
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: candidate-OpenBSD-8.0-amd64
+          path: downloads
+      - name: Install the VM host tools
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get install -y --no-install-recommends qemu-system-x86 qemu-utils ipxe-qemu signify-openbsd
+          if test -c /dev/kvm; then sudo setfacl -m "u:$(id -un):rw" /dev/kvm; fi
+      - name: Verify the candidate on a fresh disk with the official OpenBSD installer
+        run: |
+          (cd downloads && sha256sum --check SHA256)
+          payload="$RUNNER_TEMP/openbsd-test"
+          mkdir -p "$payload/candidate"
+          cp downloads/*.tgz "$payload/candidate/"
+          cp downloads/SHA256 packaging/openbsd/ci/check-package.sh packaging/freebsd/check-installed.sh \
+              packaging/run_selftests.sh "$payload/"
+          bash packaging/openbsd/clean-vm/run.sh "$payload" check-package.sh
+      - name: Offer the tested standalone OpenBSD package
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          path: downloads/*.tgz
+          archive: false
+          if-no-files-found: error
+      - name: Offer the package, matching source and OpenBSD checksums together
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: libremerge-OpenBSD-8.0-amd64
+          path: downloads/
+          if-no-files-found: error
+          compression-level: 0
+# LM4FBS END

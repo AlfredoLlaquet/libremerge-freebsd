@@ -12,7 +12,7 @@
 #include <QCoreApplication>
 #include <QProcess>
 // LM4FBS BEGIN ADDITION
-#ifdef Q_OS_FREEBSD
+#if defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
 #include <QStandardPaths>
 #endif
 // LM4FBS END
@@ -85,7 +85,7 @@ bool moveToTrash(const QString &path)
 		return trashThroughPortal(path);
 #endif
 // LM4FBS BEGIN ADDITION — Qt creates Trash inside an existing XDG data directory.
-#ifdef Q_OS_FREEBSD
+#if defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
 	const QString dataHome = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
 	if (dataHome.isEmpty() || !QDir().mkpath(dataHome))
 		return false;

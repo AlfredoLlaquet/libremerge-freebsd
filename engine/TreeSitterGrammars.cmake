@@ -59,6 +59,11 @@ function(lm_tree_sitter_fetch repo commit sha256 out_var)
     file(SHA256 "${archive}" actual)
   endif()
   if(NOT EXISTS "${archive}" OR NOT actual STREQUAL sha256)
+    # LM4FBS BEGIN ADDITION — A ports build must use its verified source bundle.
+    if(CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" AND FETCHCONTENT_FULLY_DISCONNECTED)
+      message(FATAL_ERROR "Missing or incorrect offline grammar archive: ${archive}")
+    endif()
+    # LM4FBS END
     message(STATUS "Downloading ${repo} at ${commit}")
     file(DOWNLOAD "https://github.com/${repo}/archive/${commit}.tar.gz" "${archive}"
       EXPECTED_HASH SHA256=${sha256} TLS_VERIFY ON STATUS status)

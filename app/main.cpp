@@ -524,6 +524,9 @@ int main(int argc, char *argv[])
 #ifdef Q_OS_FREEBSD
 	parser.setApplicationDescription(
 		QStringLiteral("A free differencing and merging tool for FreeBSD"));
+#elif defined(Q_OS_OPENBSD)
+	parser.setApplicationDescription(
+		QStringLiteral("A free differencing and merging tool for OpenBSD"));
 #else
 	parser.setApplicationDescription(
 		QStringLiteral("A free differencing and merging tool for macOS and Linux"));
@@ -1510,7 +1513,7 @@ int main(int argc, char *argv[])
 			check(fine, "Help: the project's page, its issues and the call for translators, above About");
 			if (!shots.isEmpty() && help != nullptr)
 				help->grab().save(QStringLiteral("%1/star-%2-help.png").arg(shots, language));
-// LM4FBS BEGIN — Check the FreeBSD destinations without opening the browser.
+// LM4FBS BEGIN — Check the downstream destinations without opening the browser.
 // 			const QString home = QStringLiteral("https://github.com/iagodpassos/libremerge");
 // 			check(lm::projectPage() == QUrl(home)
 // 				&& lm::projectIssuesPage() == QUrl(home + QStringLiteral("/issues"))
@@ -1518,11 +1521,11 @@ int main(int argc, char *argv[])
 // 				&& AboutDialog::homepageUrl() == lm::projectPage(),
 // 				"the pages are the project's own, the About box's among them");
 // LM4FBS REPLACEMENT
-#ifdef Q_OS_FREEBSD
+#if defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
 			const QUrl home(QStringLiteral("https://github.com/AlfredoLlaquet/libremerge-freebsd"));
 			check(lm::projectPage() == home && lm::projectIssuesPage() == home
 				&& lm::projectTranslationsPage() == home && AboutDialog::homepageUrl() == home,
-				"FreeBSD Help and About direct users to the downstream repository");
+				"Help and About direct users to the downstream repository");
 #else
 			const QString home = QStringLiteral("https://github.com/iagodpassos/libremerge");
 			check(lm::projectPage() == QUrl(home)
@@ -11505,6 +11508,8 @@ int main(int argc, char *argv[])
 // LM4FBS BEGIN ADDITION
 #ifdef Q_OS_FREEBSD
 		ok = ok && AboutDialog::platformText().startsWith(QStringLiteral("FreeBSD "));
+#elif defined(Q_OS_OPENBSD)
+		ok = ok && AboutDialog::platformText().startsWith(QStringLiteral("OpenBSD "));
 #endif
 // LM4FBS END
 		for (const QString &name : mustCredit)
@@ -11603,7 +11608,7 @@ int main(int argc, char *argv[])
 	if (parser.isSet(selftestFolder3OpsOpt))
 	{
 // LM4FBS BEGIN ADDITION — Report a failed file operation even on a headless test run.
-#ifdef Q_OS_FREEBSD
+#if defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
 		lm::setUnattended(true);
 #endif
 // LM4FBS END

@@ -16,6 +16,18 @@ class PathTestPosix : public testing::Test
 {
 };
 
+// LM4FBS BEGIN ADDITION — A relative fixture path can also resolve through the test working directory.
+#if defined(__FreeBSD__) || defined(__OpenBSD__)
+TEST_F(PathTestPosix, ProgramDirectoryContainsTheRunningTestBinary)
+{
+	const String directory = env::GetProgPath();
+	ASSERT_TRUE(paths::IsPathAbsolute(directory)) << directory;
+	const String executable = paths::ConcatPath(directory, _T("libremerge-tests"));
+	EXPECT_EQ(::access(executable.c_str(), X_OK), 0) << executable;
+}
+#endif
+// LM4FBS END
+
 TEST_F(PathTestPosix, EndsWithSlash)
 {
 	EXPECT_TRUE(paths::EndsWithSlash(_T("/")));

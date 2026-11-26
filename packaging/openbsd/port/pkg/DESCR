@@ -1,0 +1,3 @@
+LibreMerge compares and merges files, folders, and tables in a Qt 6
+desktop interface. It uses WinMerge's comparison engine and includes
+syntax highlighting, filters, image comparison, and three-way merging.

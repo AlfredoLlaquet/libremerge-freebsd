@@ -97,6 +97,9 @@ String GetProgPath()
 		size_t size = sizeof(buf);
 		if (sysctl(mib, sizeof(mib) / sizeof(mib[0]), buf, &size, nullptr, 0) != 0)
 			buf[0] = '\0';
+#elif defined(__OpenBSD__)
+		if (getexecpath(buf, sizeof(buf)) == -1)
+			buf[0] = '\0';
 // LM4FBS END
 #else
 		ssize_t n = readlink("/proc/self/exe", buf, sizeof(buf) - 1);

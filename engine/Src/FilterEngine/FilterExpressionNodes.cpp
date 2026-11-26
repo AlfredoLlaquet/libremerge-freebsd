@@ -20,7 +20,8 @@
 #include <variant>
 #include <cctype>
 // LM4FBS BEGIN ADDITION
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__) || defined(__OpenBSD__)
+#define LM_BSD_FILTER_TIME
 #include <ctime>
 #endif
 // LM4FBS END
@@ -1013,8 +1014,8 @@ static auto FileEOLStrField(int index, const FilterEvalContext& ectxt) -> ValueT
 	return EOLStr(GetEOLStyleFromStats(ectxt.di->diffFileInfo[index].m_textStats));
 }
 
-// LM4FBS BEGIN ADDITION — Let FreeBSD resolve the local offset at the date being compared.
-#ifdef __FreeBSD__
+// LM4FBS BEGIN ADDITION — Use the BSD time zone rules for the date being compared.
+#ifdef LM_BSD_FILTER_TIME
 static Poco::Timestamp localFilterTimestamp(const Poco::DateTime& date)
 {
 	std::tm civil{};
@@ -1051,7 +1052,7 @@ static std::optional<Poco::Timestamp> ParseDateTime(const std::string& str)
 		// LM4FBS BEGIN — The fractional format also accepts whole seconds.
 		// Poco::DateTimeFormat::ISO8601_FORMAT,
 		// LM4FBS REPLACEMENT
-#ifndef __FreeBSD__
+#ifndef LM_BSD_FILTER_TIME
 		Poco::DateTimeFormat::ISO8601_FORMAT,
 #endif
 		// LM4FBS END
@@ -1065,7 +1066,7 @@ static std::optional<Poco::Timestamp> ParseDateTime(const std::string& str)
 	};
 
 	// LM4FBS BEGIN ADDITION — Separate the zone before parsing a clock with optional seconds.
-#ifdef __FreeBSD__
+#ifdef LM_BSD_FILTER_TIME
 	std::string civil = Poco::trim(str);
 	std::optional<int> explicitOffset;
 	static const Poco::RegularExpression numericZone(
@@ -1098,7 +1099,7 @@ static std::optional<Poco::Timestamp> ParseDateTime(const std::string& str)
 			// Poco::DateTimeParser::parse(fmt, str, dt, tz);
 			// dt.makeUTC((str.find_first_of("zZ+") != std::string::npos) ? tz : Poco::Timezone::tzd());
 			// LM4FBS REPLACEMENT
-#ifdef __FreeBSD__
+#ifdef LM_BSD_FILTER_TIME
 			Poco::DateTimeParser::parse(fmt, civil, dt, tz);
 			if (!explicitOffset)
 				return localFilterTimestamp(dt);
@@ -1150,7 +1151,7 @@ static auto DateStrField(int index, const FilterEvalContext& ectxt) -> ValueType
 	// LM4FBS BEGIN — Format the file's timestamp in its historical local time.
 	// Poco::LocalDateTime ldt(Poco::Timezone::tzd(), ectxt.di->diffFileInfo[index].mtime);
 	// LM4FBS REPLACEMENT
-#ifdef __FreeBSD__
+#ifdef LM_BSD_FILTER_TIME
 	auto ldt = filterLocalDateTime(ectxt.di->diffFileInfo[index].mtime);
 #else
 	Poco::LocalDateTime ldt(Poco::Timezone::tzd(), ectxt.di->diffFileInfo[index].mtime);
@@ -1775,7 +1776,7 @@ inline static std::optional<Poco::LocalDateTime> toLocalDateTime(const ValueType
 	// if (auto str = std::get_if<std::string>(&val))
 	// 	return Poco::LocalDateTime(DateTimeLiteral(*str).value);
 	// LM4FBS REPLACEMENT
-#ifdef __FreeBSD__
+#ifdef LM_BSD_FILTER_TIME
 	if (auto ts = std::get_if<Poco::Timestamp>(&val))
 		return filterLocalDateTime(*ts);
 	if (auto str = std::get_if<std::string>(&val))
@@ -2213,7 +2214,7 @@ static auto StartOfWeekFunc(const FilterEvalContext& ectxt, std::vector<ExprNode
 			// Poco::Timespan offset(dow, 0, 0, 0, 0);
 			// return (startOfDay - offset).utc().timestamp();
 			// LM4FBS REPLACEMENT
-#ifdef __FreeBSD__
+#ifdef LM_BSD_FILTER_TIME
 			const Poco::DateTime day(ldt.year(), ldt.month(), ldt.day());
 			return localFilterTimestamp(day - Poco::Timespan(day.dayOfWeek(), 0, 0, 0, 0));
 #else
@@ -2238,7 +2239,7 @@ static auto StartOfMonthFunc(const FilterEvalContext& ectxt, std::vector<ExprNod
 			// LM4FBS BEGIN
 			// return Poco::LocalDateTime(ldt.year(), ldt.month(), 1, 0, 0, 0, 0, 0).utc().timestamp();
 			// LM4FBS REPLACEMENT
-#ifdef __FreeBSD__
+#ifdef LM_BSD_FILTER_TIME
 			return localFilterTimestamp(Poco::DateTime(ldt.year(), ldt.month(), 1));
 #else
 			return Poco::LocalDateTime(ldt.year(), ldt.month(), 1, 0, 0, 0, 0, 0).utc().timestamp();
@@ -2259,7 +2260,7 @@ static auto StartOfYearFunc(const FilterEvalContext& ectxt, std::vector<ExprNode
 			// LM4FBS BEGIN
 			// return Poco::LocalDateTime(ldt.year(), 1, 1, 0, 0, 0, 0, 0).utc().timestamp();
 			// LM4FBS REPLACEMENT
-#ifdef __FreeBSD__
+#ifdef LM_BSD_FILTER_TIME
 			return localFilterTimestamp(Poco::DateTime(ldt.year(), 1, 1));
 #else
 			return Poco::LocalDateTime(ldt.year(), 1, 1, 0, 0, 0, 0, 0).utc().timestamp();

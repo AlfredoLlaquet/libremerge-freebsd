@@ -24,7 +24,7 @@ check_installation() (
   if [ -n "$build" ]; then
     ctest --test-dir "$build" --output-on-failure --no-tests=error
   fi
-  QT_QPA_PLATFORM=offscreen bash "$selftests" "$app"
+  QT_QPA_PLATFORM=offscreen sh "$selftests" "$app"
 
   Xvfb -screen 0 1280x900x24 -nolisten tcp -displayfd 1 > "$work/display" &
   server=$!
@@ -55,7 +55,7 @@ check_installation() (
 )
 
 for zone in UTC Europe/Madrid; do
-  printf '\nRunning FreeBSD tests in %s\n' "$zone"
+  printf '\nRunning %s tests in %s\n' "$(uname -s)" "$zone"
   TZ=$zone
   export TZ
   check_installation

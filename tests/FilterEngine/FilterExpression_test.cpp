@@ -15,7 +15,7 @@
 #include "MergeApp.h"
 
 // LM4FBS BEGIN ADDITION
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__) || defined(__OpenBSD__)
 #include <cstdlib>
 #include <ctime>
 #endif
@@ -4646,8 +4646,8 @@ TEST_P(FilterExpressionTest, ContainsWhateverTheCase)
 }
 
 // LM4FBS BEGIN ADDITION — Check historical local times against independently specified UTC instants.
-#ifdef __FreeBSD__
-TEST_P(FilterExpressionTest, FreeBSDFiltersUseTheOffsetOfTheDate)
+#if defined(__FreeBSD__) || defined(__OpenBSD__)
+TEST_P(FilterExpressionTest, LocalFiltersUseTheOffsetOfTheDate)
 {
 	const char *previous = std::getenv("TZ");
 	struct RestoreTimeZone {

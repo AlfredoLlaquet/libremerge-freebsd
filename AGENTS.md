@@ -1,4 +1,4 @@
-# LibreMerge for FreeBSD — Project Purpose and Working Rules
+# LibreMerge for FreeBSD and OpenBSD — Project Purpose and Working Rules
 
 > [!IMPORTANT]
 > **Never send any request upstream.** Treat LibreMerge, WinMerge, and every other upstream project as read-only. Never push changes upstream, open a pull request or issue there, ask for a feature, review, or support, or contact upstream maintainers by comment, discussion, email, or private message. This rule covers everyone acting on behalf of this project, including automated workflows. Reading documentation and fetching upstream source and tags are part of normal maintenance.
@@ -13,11 +13,13 @@ Use the following repository description verbatim.
 
 Keep the application name **LibreMerge**. The goal is to make the existing Qt 6 file and folder comparison and merge application build and run natively on FreeBSD. Its immediate upstream is `iagodpassos/libremerge`, which uses WinMerge’s comparison engine. Keep FreeBSD changes focused so the interface and comparison behavior stay familiar and future releases are easy to merge. [Upstream LibreMerge](https://github.com/iagodpassos/libremerge)
 
+Since November 26, 2026, the same fork also targets OpenBSD. Develop both platforms on `development`. Preserve existing FreeBSD source, binary, and upgrade coverage when extending OpenBSD support. The initial OpenBSD target is 8.0 amd64, with both installation from source and a binary produced by OpenBSD’s ports framework.
+
 Programmed by **ChatGPT** for Alfredo Llaquet-Alsina.
 
-## Marking FreeBSD code changes
+## Marking downstream code changes
 
-Use one pair of `LM4FBS` markers around each logical block changed for this port. Keep the marker words the same in every language and use the file’s own comment syntax. Add a short reason to the opening marker when it helps explain the change.
+Use one pair of `LM4FBS` markers around each logical code block changed for either BSD. Keep the marker words the same in every language and use the file’s own comment syntax. Keep machine-readable manifests, checksums, packing lists, and unmodified third-party sources in their native formats. Add a short reason to the opening marker when it helps explain the change.
 
 For a replacement, start with `LM4FBS BEGIN` and preserve the complete upstream block immediately below it as comments, retaining its line breaks and indentation. Put `LM4FBS REPLACEMENT` on its own comment line, followed by the active replacement block and then `LM4FBS END`. This C++ example shows the five parts together.
 
@@ -67,9 +69,15 @@ Build the release candidate natively on FreeBSD 14.4 and 15.1 amd64. Use the old
 
 In separate fresh VMs, install the actual candidate with `pkg install ./filename.pkg`, verify its version and contents, and test a real upgrade from the previous revision. Exercise the 14 package on both 14.4 and 14.5, and the 15 package on 15.1. Record the actual kernel and userland patch levels. When coverage changes, update both the workflow and the README’s tested and expected compatibility. Keep a successful source build distinct from a verified binary installation.
 
+### Native OpenBSD validation
+
+Build and install the documented source checkout with base Clang as a regular user, elevating privileges for installation. Use the OpenBSD release’s ports tree to build the binary package from the matching complete source archive. Keep all pinned sources and license notices needed for an offline rebuild in that archive. The overlay and build instructions are in [packaging/openbsd](packaging/openbsd/README.md).
+
+Install the resulting `.tgz` in a separate VM created from official OpenBSD media on an empty disk with the base and X sets. Use the normal OpenBSD mirrors for runtime dependencies. Exercise the installed application before adding test-only packages. Cover file and folder comparison, a saved merge and its backup, application self-tests, and the source build’s CTest suite. Record release and architecture, and give Alfredo the tested commit, source instructions and downloads. An OpenBSD development artifact can be distributed for review; a tagged release and a merge to `main` still require separate authorization.
+
 ### Keeping the README in sync
 
-Maintain the FreeBSD notice at the top of `README.md`. Its opening paragraph introduces LibreMerge and its FreeBSD port, names the source, packaged binaries, and installation instructions, and links to the full upstream project URL. Keep the programming credit from “Purpose and name” below that paragraph. Keep FreeBSD-specific README edits in the notice. Preserve the visible space before the first horizontal rule (`---`) and the blank line after it.
+Maintain the BSD notice at the top of `README.md`. Its opening paragraph introduces LibreMerge, names both operating systems and the available installation methods, and links to the full upstream project URL. Keep the programming credit from “Purpose and name” below that paragraph. Keep downstream README edits in the notice. Preserve the visible space before the first horizontal rule (`---`) and the blank line after it.
 
 Write the notice for people installing, updating, and using LibreMerge. Link directly to the published packages and leave the default branch implicit, including in the source update command (`git pull --ff-only`). Give Alfredo any development downloads, GitHub sign-in instructions, and workflow links in the testing handoff. Keep historical test results in their release notes.
 

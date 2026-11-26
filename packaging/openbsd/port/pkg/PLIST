@@ -1,0 +1,162 @@
+@comment LM4FBS BEGIN ADDITION
+@bin bin/libremerge
+lib/libremerge/
+lib/libremerge/TreeSitterGrammars/
+lib/libremerge/TreeSitterGrammars/bash-highlights.scm
+lib/libremerge/TreeSitterGrammars/c-highlights.scm
+lib/libremerge/TreeSitterGrammars/c-sharp-highlights.scm
+lib/libremerge/TreeSitterGrammars/c-sharp-tags.scm
+lib/libremerge/TreeSitterGrammars/c-tags.scm
+lib/libremerge/TreeSitterGrammars/cpp-highlights.scm
+lib/libremerge/TreeSitterGrammars/cpp-injections.scm
+lib/libremerge/TreeSitterGrammars/cpp-tags.scm
+lib/libremerge/TreeSitterGrammars/css-highlights.scm
+lib/libremerge/TreeSitterGrammars/dtd-highlights.scm
+lib/libremerge/TreeSitterGrammars/fsharp-highlights.scm
+lib/libremerge/TreeSitterGrammars/fsharp-injections.scm
+lib/libremerge/TreeSitterGrammars/fsharp-locals.scm
+lib/libremerge/TreeSitterGrammars/fsharp-tags.scm
+lib/libremerge/TreeSitterGrammars/fsharp_signature-highlights.scm
+lib/libremerge/TreeSitterGrammars/fsharp_signature-injections.scm
+lib/libremerge/TreeSitterGrammars/fsharp_signature-locals.scm
+lib/libremerge/TreeSitterGrammars/fsharp_signature-tags.scm
+lib/libremerge/TreeSitterGrammars/go-highlights.scm
+lib/libremerge/TreeSitterGrammars/go-tags.scm
+lib/libremerge/TreeSitterGrammars/html-highlights.scm
+lib/libremerge/TreeSitterGrammars/html-injections.scm
+lib/libremerge/TreeSitterGrammars/ini-highlights.scm
+lib/libremerge/TreeSitterGrammars/java-highlights.scm
+lib/libremerge/TreeSitterGrammars/java-tags.scm
+lib/libremerge/TreeSitterGrammars/javascript-highlights.scm
+lib/libremerge/TreeSitterGrammars/javascript-injections.scm
+lib/libremerge/TreeSitterGrammars/javascript-locals.scm
+lib/libremerge/TreeSitterGrammars/javascript-tags.scm
+lib/libremerge/TreeSitterGrammars/json-highlights.scm
+lib/libremerge/TreeSitterGrammars/licenses/
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-bash-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-c-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-c-sharp-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-cpp-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-css-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-fsharp-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-go-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-html-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-ini-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-java-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-javascript-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-json-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-markdown-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-php-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-properties-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-python-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-ruby-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-rust-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-toml-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-typescript-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-unicode-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-xml-LICENSE
+lib/libremerge/TreeSitterGrammars/licenses/tree-sitter-yaml-LICENSE
+lib/libremerge/TreeSitterGrammars/markdown-highlights.scm
+lib/libremerge/TreeSitterGrammars/markdown-injections.scm
+lib/libremerge/TreeSitterGrammars/markdown_inline-highlights.scm
+lib/libremerge/TreeSitterGrammars/markdown_inline-injections.scm
+lib/libremerge/TreeSitterGrammars/php-highlights.scm
+lib/libremerge/TreeSitterGrammars/php-injections.scm
+lib/libremerge/TreeSitterGrammars/php-tags.scm
+lib/libremerge/TreeSitterGrammars/php_only-highlights.scm
+lib/libremerge/TreeSitterGrammars/php_only-injections.scm
+lib/libremerge/TreeSitterGrammars/php_only-tags.scm
+lib/libremerge/TreeSitterGrammars/properties-highlights.scm
+lib/libremerge/TreeSitterGrammars/properties-tags.scm
+lib/libremerge/TreeSitterGrammars/python-highlights.scm
+lib/libremerge/TreeSitterGrammars/python-tags.scm
+lib/libremerge/TreeSitterGrammars/ruby-highlights.scm
+lib/libremerge/TreeSitterGrammars/ruby-locals.scm
+lib/libremerge/TreeSitterGrammars/ruby-tags.scm
+lib/libremerge/TreeSitterGrammars/rust-highlights.scm
+lib/libremerge/TreeSitterGrammars/rust-injections.scm
+lib/libremerge/TreeSitterGrammars/rust-tags.scm
+lib/libremerge/TreeSitterGrammars/toml-highlights.scm
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-bash.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-c-sharp.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-c.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-cpp.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-css.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-dtd.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-fsharp.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-fsharp_signature.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-go.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-html.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-ini.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-java.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-javascript.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-json.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-markdown.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-markdown_inline.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-php.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-php_only.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-properties.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-python.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-ruby.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-rust.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-toml.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-tsx.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-typescript.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-xml.so
+@so lib/libremerge/TreeSitterGrammars/tree-sitter-yaml.so
+lib/libremerge/TreeSitterGrammars/tsx-highlights.scm
+lib/libremerge/TreeSitterGrammars/tsx-injections.scm
+lib/libremerge/TreeSitterGrammars/tsx-locals.scm
+lib/libremerge/TreeSitterGrammars/tsx-tags.scm
+lib/libremerge/TreeSitterGrammars/typescript-highlights.scm
+lib/libremerge/TreeSitterGrammars/typescript-injections.scm
+lib/libremerge/TreeSitterGrammars/typescript-locals.scm
+lib/libremerge/TreeSitterGrammars/typescript-tags.scm
+lib/libremerge/TreeSitterGrammars/xml-highlights.scm
+lib/libremerge/TreeSitterGrammars/yaml-highlights.scm
+share/applications/libremerge.desktop
+share/doc/libremerge/
+share/doc/libremerge/openbsd-dependencies.txt
+share/icons/hicolor/128x128/apps/libremerge.png
+share/icons/hicolor/16x16/apps/libremerge.png
+share/icons/hicolor/256x256/apps/libremerge.png
+share/icons/hicolor/32x32/apps/libremerge.png
+share/icons/hicolor/512x512/apps/libremerge.png
+share/icons/hicolor/64x64/apps/libremerge.png
+share/kio/
+share/kio/servicemenus/
+share/kio/servicemenus/libremerge.desktop
+share/libremerge/
+share/libremerge/ColorSchemes/
+share/libremerge/ColorSchemes/Default.ini
+share/libremerge/ColorSchemes/Midnight.ini
+share/libremerge/ColorSchemes/Modern.ini
+share/libremerge/ColorSchemes/Solarized Dark.ini
+share/libremerge/ColorSchemes/Solarized Light.ini
+share/libremerge/ColorSchemes/Twilight.ini
+share/libremerge/ColorSchemes/VS Dark.ini
+share/libremerge/Filters/
+share/libremerge/Filters/ADAMulti.flt
+share/libremerge/Filters/ASPNET.flt
+share/libremerge/Filters/CSharp_loose.flt
+share/libremerge/Filters/Delphi.flt
+share/libremerge/Filters/FileFilter.tmpl
+share/libremerge/Filters/Frontpage.flt
+share/libremerge/Filters/MASM.flt
+share/libremerge/Filters/Merge_GnuC_loose.flt
+share/libremerge/Filters/Merge_VB_loose.flt
+share/libremerge/Filters/Merge_VC_loose.flt
+share/libremerge/Filters/SourceControl.flt
+share/libremerge/Filters/Symbian.flt
+share/libremerge/Filters/XML_html.flt
+share/licenses/
+share/licenses/libremerge/
+share/licenses/libremerge/LICENSE
+share/licenses/libremerge/VENDORED.md
+share/licenses/libremerge/xdiff-COPYING
+share/metainfo/
+share/metainfo/io.github.iagodpassos.libremerge.appdata.xml
+@tag update-desktop-database
+@tag gtk-update-icon-cache %D/share/icons/hicolor
+@comment LM4FBS END
