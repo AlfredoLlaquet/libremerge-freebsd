@@ -97,7 +97,7 @@ guest_running() {
 echo 'Starting a clean OpenBSD installation from the verified release media.'
 until grep -Fq 'Response file location?' "$work/console.log"; do guest_running; sleep 2; done
 printf '%s\r' 'http://10.0.2.2:18880/install.conf' >&3
-ssh_guest=(ssh -p 2222 -i "$work/guest-key" -o IdentitiesOnly=yes -o BatchMode=yes
+ssh_guest=(ssh -F /dev/null -p 2222 -i "$work/guest-key" -o IdentitiesOnly=yes -o BatchMode=yes
     -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new -o "UserKnownHostsFile=$work/known_hosts"
     root@127.0.0.1)
 until "${ssh_guest[@]}" true 2>/dev/null; do guest_running; sleep 5; done

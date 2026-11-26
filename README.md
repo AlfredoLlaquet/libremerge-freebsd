@@ -146,7 +146,7 @@ All packages listed here are for **amd64** (64-bit Intel or AMD). Choose the pac
 
 **Expected compatibility.** Later patch levels of the releases above and later minor releases in the same major series on amd64 should work when compatible versions of Qt and the other runtime libraries are available. These versions have not been tested individually. A later 14.x release would use the FreeBSD 14 package.
 
-The OpenBSD port targets **8.0 amd64**. Each OpenBSD binary package is built for a particular release and architecture.
+On **OpenBSD 8.0 amd64**, the automated checks cover building and installing from source, installing the ports-built `.tgz` on a fresh system, and comparing and merging files in both installations. An OpenBSD binary package is specific to its release and architecture.
 
 <br>
 

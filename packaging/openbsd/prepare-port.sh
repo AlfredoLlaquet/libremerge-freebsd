@@ -33,11 +33,20 @@ rmdir "$work/$distname/packaging/openbsd" "$work/$distname/packaging" "$work/$di
 # The same recipe can be used in /usr/ports/mystuff without this override.
 cat > "$port/candidate.mk" <<'EOF'
 PORTSDIR_PATH = ${.CURDIR:H:H}:${PORTSDIR}
-DISTDIR = ${.CURDIR:H:H:H}/distfiles
-WRKOBJDIR = ${.CURDIR:H:H:H}/pobj
-PACKAGE_REPOSITORY = ${.CURDIR:H:H:H}/packages
+LM_CANDIDATE = ${.CURDIR:H:H:H}
+DISTDIR = ${LM_CANDIDATE}/distfiles
+WRKOBJDIR = ${LM_CANDIDATE}/pobj
+LOCKDIR = ${LM_CANDIDATE}/locks
+PACKAGE_REPOSITORY = ${LM_CANDIDATE}/packages
+PLIST_REPOSITORY = ${LM_CANDIDATE}/plist
+BULK_COOKIES_DIR = ${LM_CANDIDATE}/bulk/${MACHINE_ARCH}
+UPDATE_COOKIES_DIR = ${LM_CANDIDATE}/update/${MACHINE_ARCH}
 EOF
 cd "$port"
+privsep=$(make show=PORTS_PRIVSEP)
+case "$privsep" in
+    [Yy][Ee][Ss]) make fix-permissions >&2 ;;
+esac
 make makesum >&2
 make checksum >&2
 trap - EXIT HUP INT TERM

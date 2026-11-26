@@ -1,4 +1,9 @@
-#!/bin/bash
+#!/bin/sh
+# LM4FBS BEGIN — The executable interpreter directive must occupy line one.
+# #!/bin/bash
+# LM4FBS REPLACEMENT
+# The base-system sh interpreter is selected above.
+# LM4FBS END
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Run the app's headless selftest suite against a given binary.
 # Usage: run_selftests.sh <libremerge-binary>

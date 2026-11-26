@@ -30,6 +30,8 @@ su -l lmbuild -c '
     cd libremerge
     sh packaging/freebsd/check-installed.sh "$PWD/packaging/run_selftests.sh" "$PWD/build"
     sh packaging/openbsd/make-source.sh "$PWD/build/_deps/openbsd-distfiles" /home/lmbuild/release
+    # The port will compile again from the archive in its own work directory.
+    rm -rf build
 '
 
 # Keep the framework and its build objects on the larger /home filesystem.
@@ -49,7 +51,9 @@ set -- "$workspace"/out/*-source.tar.gz
 test "$#" -eq 1
 port=$(sh "$src/packaging/openbsd/prepare-port.sh" "$1" /home/ports-work)
 cd "$port"
-make FETCH_PACKAGES= package
+# Only dependencies may come from the mirrors. Build this commit from its distfile.
+make FETCH_PACKAGES= prepare install-depends
+make FETCH_PACKAGES=No package
 make lib-depends-check
 package=$(make show=PKGFILE)
 cp "$package" "$workspace/out/"

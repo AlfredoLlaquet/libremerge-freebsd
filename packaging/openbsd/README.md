@@ -30,21 +30,23 @@ signify -C -p /etc/signify/openbsd-80-base.pub -x SHA256.sig ports.tar.gz
 su root -c 'tar -C /usr -xzf ports.tar.gz'
 ```
 
-In a root shell, start in the directory containing the verified LibreMerge source archive and its unpacked `libremerge-1.5.0` directory. Put the work directory on a filesystem with room for the extracted source and compilation. The helper prints the path of a new private overlay. The release ports tree remains available to resolve dependencies.
+In a root shell, start in the directory containing the verified LibreMerge source archive and its unpacked `libremerge-1.5.0` directory. Put the work directory on a filesystem with room for the extracted source and compilation. The helper prints the path to a new overlay and uses the release ports tree to resolve dependencies. On a system configured with `PORTS_PRIVSEP=Yes`, the work directory’s parent must be accessible to the ports build users. The helper applies the framework’s ownership settings inside the new work directory.
 
 ```sh
 archive="$PWD/libremerge-1.5.0-source.tar.gz"
 port=$(sh libremerge-1.5.0/packaging/openbsd/prepare-port.sh "$archive" /usr/local/pobj)
 cd "$port"
-make FETCH_PACKAGES= package
+make FETCH_PACKAGES= prepare install-depends
+make FETCH_PACKAGES=No package
+make lib-depends-check
 make show=PKGFILE
 ```
 
-The last command prints the full path to `libremerge-1.5.0.tgz`. The framework stages the installation, checks the packing list and shared libraries, and creates the package. `FETCH_PACKAGES=` allows it to install dependencies from the OpenBSD package mirrors. The candidate itself is built locally.
+The first `make` installs build and runtime dependencies from the OpenBSD package mirrors. The second turns off binary fetching for LibreMerge itself and builds the candidate from the supplied archive. The framework stages the installation and checks the packing list. `lib-depends-check` verifies its shared library declarations, and the last command prints the full path to `libremerge-1.5.0.tgz`.
 
 ## Build and verify a development candidate
 
-After building the Git checkout using the main README, run the following at the top of that checkout as your regular user. The helper combines the tracked commit with the verified sources from its CMake download directory and writes the complete source archive to the output directory.
+After building the Git checkout using the main README, run the following at the top of that checkout as your regular user. The helper combines the files at the current Git commit with the verified sources from its CMake download directory. Commit any local changes you intend to include in the package before creating this archive.
 
 ```sh
 sh packaging/openbsd/make-source.sh "$PWD/build/_deps/openbsd-distfiles" "$PWD/out"
