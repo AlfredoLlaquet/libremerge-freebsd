@@ -58,7 +58,7 @@ def create_package(build, version, destination):
             "comment": "Graphical file and folder comparison and merging",
             "desc": "Native FreeBSD port of the Qt LibreMerge application with the WinMerge comparison engine.",
             "maintainer": "AlfredoLlaquet@users.noreply.github.com",
-            "www": "https://github.com/AlfredoLlaquet/libremerge-freebsd",
+            "www": "https://github.com/AlfredoLlaquet/libremerge-bsd",
             "licenses": ["GPLv3+"], "licenselogic": "single", "deps": deps, "files": files,
         }
         spec = work / "manifest.json"

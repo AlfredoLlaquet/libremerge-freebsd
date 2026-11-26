@@ -5,34 +5,30 @@ workspace=$PWD
 scripts=$workspace/packaging/freebsd
 . "$scripts/release.conf"
 out=$workspace/out
-src=/home/lmbuild/libremerge-freebsd
+src=/home/lmbuild/libremerge-bsd
 pw useradd -n lmbuild -m -s /bin/sh
 cp -R "$workspace" "$src"
 chown -R lmbuild:lmbuild "$src"
 mkdir -p "$out/release" "$out/previous"
 cd "$src"
 
-build_at() {
-  su lmbuild -c "git checkout --detach '$1'"
-  su lmbuild -c '
-    set -eu
-    cmake -S . -B build -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make \
-        -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
-    make -C build -j2
-  '
-}
-
 abi=$(pkg config ABI | tr : -)
-if [ "$previous_tag" = v1.5.0-freebsd.2 ]; then
-  # The last source-only release has no published .pkg. Build its actual tag.
-  build_at "$previous_tag"
-  python3 "$scripts/package.py" build "$previous_version" "$out/previous"
-else
-  file="libremerge-$previous_version-$abi.pkg"
-  fetch -o "$out/previous/$file" "https://github.com/AlfredoLlaquet/libremerge-freebsd/releases/download/$previous_tag/$file"
-fi
+file="libremerge-$previous_version-$abi.pkg"
+release="https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/$previous_tag"
+(
+  cd "$out/previous"
+  fetch -o "$file" "$release/$file"
+  fetch -o SHA256SUMS "$release/SHA256SUMS"
+  sha256sum --ignore-missing -c SHA256SUMS
+)
 
-build_at "$GITHUB_SHA"
+test "$(su lmbuild -c 'git rev-parse HEAD')" = "$GITHUB_SHA"
+su lmbuild -c '
+  set -eu
+  cmake -S . -B build -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make \
+      -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+  make -C build -j2
+'
 make -C build install
 python3 "$scripts/package.py" build "$package_version" "$out/release"
 

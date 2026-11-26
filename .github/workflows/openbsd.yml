@@ -5,17 +5,40 @@ on: [push, pull_request, workflow_dispatch]
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   build:
     name: Source build and native port on OpenBSD 8.0 amd64
-    if: github.repository == 'AlfredoLlaquet/libremerge-freebsd'
+    if: github.repository == 'AlfredoLlaquet/libremerge-bsd'
     runs-on: ubuntu-24.04
     timeout-minutes: 150
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
+      - name: Obtain the exact previous OpenBSD package while its artifact is available
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          . packaging/openbsd/ci/previous.conf
+          archive="$RUNNER_TEMP/previous-openbsd.zip"
+          url="$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/artifacts/$previous_bundle_id/zip"
+          status=$(curl --silent --show-error --location --retry 3 \
+            --header "Authorization: Bearer $GH_TOKEN" --output "$archive" --write-out '%{http_code}' "$url")
+          case "$status" in
+            200)
+              mkdir previous-package
+              cd previous-package
+              unzip -p "$archive" "$previous_pkgname.tgz" > "$previous_pkgname.tgz"
+              printf '%s  %s\n' "$previous_package_sha256" "$previous_pkgname.tgz" | sha256sum --check -
+              ;;
+            404|410)
+              echo "The historical artifact is unavailable. The VM will build its pinned source commit."
+              ;;
+            *) echo "Previous package download returned HTTP $status" >&2; exit 1 ;;
+          esac
       - uses: vmactions/openbsd-vm@f1ca8bc8ecc5b6ef7218e5b914836e067e1546d3 # v1.4.9
         with:
           release: '8.0'
@@ -31,7 +54,7 @@ jobs:
           compression-level: 0
 
   install:
-    name: Clean package install and GUI tests on OpenBSD 8.0 amd64
+    name: Clean package install, upgrade and GUI tests on OpenBSD 8.0 amd64
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 75
@@ -53,8 +76,10 @@ jobs:
           (cd downloads && sha256sum --check SHA256)
           payload="$RUNNER_TEMP/openbsd-test"
           mkdir -p "$payload/candidate"
+          cp -R downloads/previous "$payload/"
           cp downloads/*.tgz "$payload/candidate/"
-          cp downloads/SHA256 packaging/openbsd/ci/check-package.sh packaging/freebsd/check-installed.sh \
+          cp downloads/SHA256 packaging/openbsd/ci/check-package.sh packaging/openbsd/ci/previous.conf \
+              packaging/freebsd/check-installed.sh \
               packaging/run_selftests.sh "$payload/"
           bash packaging/openbsd/clean-vm/run.sh "$payload" check-package.sh
       - name: Offer the tested standalone OpenBSD package
@@ -67,7 +92,10 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: libremerge-OpenBSD-8.0-amd64
-          path: downloads/
+          path: |
+            downloads/*.tgz
+            downloads/*-source.tar.gz
+            downloads/SHA256
           if-no-files-found: error
           compression-level: 0
 # LM4BSD END

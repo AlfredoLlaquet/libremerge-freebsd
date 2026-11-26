@@ -4,7 +4,8 @@ set -eu
 test "$(uname -sr)" = "OpenBSD 8.0"
 test "$(machine -a)" = amd64
 workspace=$PWD
-src=/home/lmbuild/libremerge
+src=/home/lmbuild/libremerge-bsd
+. "$workspace/packaging/openbsd/ci/previous.conf"
 export PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/X11R6/bin
 
 uname -a
@@ -18,25 +19,59 @@ pkg_add -I -u -D downgrade
 pkg_add -I git cmake ninja qt6-qtbase qt6-qtsvg qt6-qtimageformats \
     qt6-qttranslations boost icu4c re2c libarchive gtest pcre2 libutf8proc vulkan-headers
 
-# Build as the same unprivileged user who will exercise the source installation.
+build_and_install() {
+    su -l lmbuild -c '
+        set -eu
+        cd libremerge-bsd
+        cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+        cmake --build build --parallel 2
+    '
+    cmake --install "$src/build"
+}
+
+# Exercise a fresh source installation and archive the exact checkout and pins.
 useradd -m -s /bin/ksh lmbuild
 cp -R "$workspace" "$src"
 chown -R lmbuild "$src"
-test "$(su -l lmbuild -c 'cd libremerge && git rev-parse HEAD')" = "$GITHUB_SHA"
+test "$(su -l lmbuild -c 'cd libremerge-bsd && git rev-parse HEAD')" = "$GITHUB_SHA"
+build_and_install
 su -l lmbuild -c '
     set -eu
-    cd libremerge
-    ulimit -a
-    cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
-    cmake --build build --parallel 2
-'
-cmake --install "$src/build"
-su -l lmbuild -c '
-    set -eu
-    cd libremerge
+    cd libremerge-bsd
     sh packaging/freebsd/check-installed.sh "$PWD/packaging/run_selftests.sh" "$PWD/build"
-    sh packaging/openbsd/make-source.sh "$PWD/build/_deps/openbsd-distfiles" /home/lmbuild/release
-    # The port will compile again from the archive in its own work directory.
+    sh packaging/openbsd/make-source.sh "$PWD/build/_deps/openbsd-distfiles" "$HOME/release"
+    rm -rf build
+'
+
+# Recreate an installed checkout of the previous version. Its following update
+# reuses both that checkout and its existing CMake cache, as documented.
+# Pin this VM's copy of the origin at the triggering commit. A later push or
+# a synthetic pull-request merge must not change what git pull updates to.
+su -l lmbuild -c "set -eu
+    cd libremerge-bsd
+    git clone --bare . ../update-origin.git
+    git -C ../update-origin.git update-ref refs/heads/main '$GITHUB_SHA'
+    git switch -C main '$previous_commit'
+    git config branch.main.remote origin
+    git config branch.main.merge refs/heads/main
+    git config url.file:///home/lmbuild/update-origin.git.insteadOf https://github.com/AlfredoLlaquet/libremerge-bsd.git"
+build_and_install
+if [ ! -f "$workspace/previous-package/$previous_pkgname.tgz" ]; then
+    su -l lmbuild -c '
+        cd libremerge-bsd &&
+            sh packaging/openbsd/make-source.sh "$PWD/build/_deps/openbsd-distfiles" "$HOME/previous-source"
+    '
+fi
+su -l lmbuild -c "set -eu
+    cd libremerge-bsd
+    git remote set-url origin https://github.com/AlfredoLlaquet/libremerge-bsd.git
+    git pull --ff-only
+    test \"\$(git rev-parse HEAD)\" = '$GITHUB_SHA'"
+build_and_install
+su -l lmbuild -c '
+    set -eu
+    cd libremerge-bsd
+    sh packaging/freebsd/check-installed.sh "$PWD/packaging/run_selftests.sh" "$PWD/build"
     rm -rf build
 '
 
@@ -50,20 +85,33 @@ signify -C -p /etc/signify/openbsd-80-base.pub -x SHA256.sig ports.tar.gz
 tar -C /home -xzf ports.tar.gz
 ln -s /home/ports /usr/ports
 
-mkdir -p "$workspace/out"
+build_port() (
+    archive=$1
+    destination=$2
+    port=$(sh "$src/packaging/openbsd/prepare-port.sh" "$archive" /home/ports-work)
+    cd "$port"
+    # Dependencies may come from the mirrors. Build LibreMerge from its distfile.
+    make FETCH_PACKAGES= prepare install-depends
+    make wantlib-args
+    make FETCH_PACKAGES=No package
+    make lib-depends-check
+    package=$(make show=PKGFILE)
+    cp "$package" "$destination/"
+    make clean
+)
+
+mkdir -p "$workspace/out/previous"
+if [ -f "$workspace/previous-package/$previous_pkgname.tgz" ]; then
+    cp "$workspace/previous-package/$previous_pkgname.tgz" "$workspace/out/previous/"
+else
+    # Actions artifacts expire. The initial OpenBSD release candidate had no
+    # tagged package, so use its real, unmodified older port as a fallback.
+    build_port /home/lmbuild/previous-source/*-source.tar.gz "$workspace/out/previous"
+fi
+(cd "$workspace/out/previous" && sha256 "$previous_pkgname.tgz" > SHA256)
+
 cp /home/lmbuild/release/*-source.tar.gz "$workspace/out/"
-set -- "$workspace"/out/*-source.tar.gz
-test "$#" -eq 1
-port=$(sh "$src/packaging/openbsd/prepare-port.sh" "$1" /home/ports-work)
-cd "$port"
-# Only dependencies may come from the mirrors. Build this commit from its distfile.
-make FETCH_PACKAGES= prepare install-depends
-# Compare the installed and ports-tree library versions before compiling the port.
-make wantlib-args
-make FETCH_PACKAGES=No package
-make lib-depends-check
-package=$(make show=PKGFILE)
-cp "$package" "$workspace/out/"
+build_port "$workspace"/out/*-source.tar.gz "$workspace/out"
 cd "$workspace/out"
 sha256 *.tgz *-source.tar.gz > SHA256
 sha256 -C SHA256 *.tgz *-source.tar.gz
