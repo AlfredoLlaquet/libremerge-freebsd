@@ -11,8 +11,10 @@ vm_pid=
 console_pid=
 cleanup() {
     local status=$?
-    if (( status != 0 )) && [[ -f $work/console.log ]]; then
-        tail -c 12000 "$work/console.log" >&2
+    if (( status != 0 )); then
+        for log in "$work/http.log" "$work/console.log" "$work/ssh.log"; do
+            if [[ -s $log ]]; then tail -c 12000 "$log" >&2; fi
+        done
     fi
     for pid in "$vm_pid" "$http_pid" "$console_pid"; do
         if [[ -n $pid ]]; then kill "$pid" 2>/dev/null || :; wait "$pid" 2>/dev/null || :; fi
@@ -100,7 +102,7 @@ printf '%s\r' 'http://10.0.2.2:18880/install.conf' >&3
 ssh_guest=(ssh -F /dev/null -p 2222 -i "$work/guest-key" -o IdentitiesOnly=yes -o BatchMode=yes
     -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new -o "UserKnownHostsFile=$work/known_hosts"
     root@127.0.0.1)
-until "${ssh_guest[@]}" true 2>/dev/null; do guest_running; sleep 5; done
+until "${ssh_guest[@]}" true 2>"$work/ssh.log"; do guest_running; sleep 5; done
 
 "${ssh_guest[@]}" /bin/sh -se <<'OPENBSD'
 uname -a

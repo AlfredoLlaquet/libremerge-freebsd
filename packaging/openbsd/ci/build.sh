@@ -59,5 +59,5 @@ package=$(make show=PKGFILE)
 cp "$package" "$workspace/out/"
 cd "$workspace/out"
 sha256 *.tgz *-source.tar.gz > SHA256
-sha256 -C SHA256
+sha256 -C SHA256 *.tgz *-source.tar.gz
 # LM4FBS END

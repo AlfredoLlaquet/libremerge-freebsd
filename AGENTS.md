@@ -73,7 +73,7 @@ In separate fresh VMs, install the actual candidate with `pkg install ./filename
 
 Build and install the documented source checkout with base Clang as a regular user, elevating privileges for installation. Use the OpenBSD release’s ports tree to build the binary package from the matching complete source archive. Keep all pinned sources and license notices needed for an offline rebuild in that archive. The overlay and build instructions are in [packaging/openbsd](packaging/openbsd/README.md).
 
-Install the resulting `.tgz` in a separate VM created from official OpenBSD media on an empty disk with the base and X sets. Use the normal OpenBSD mirrors for runtime dependencies. Exercise the installed application before adding test-only packages. Cover file and folder comparison, a saved merge and its backup, application self-tests, and the source build’s CTest suite. Record release and architecture, and give Alfredo the tested commit, source instructions and downloads. An OpenBSD development artifact can be distributed for review; a tagged release and a merge to `main` still require separate authorization.
+Install the resulting `.tgz` in a separate VM created from official OpenBSD media on an empty disk with the base and X sets. Use the normal OpenBSD mirrors for runtime dependencies. Exercise the installed application with the packages pulled in by `pkg_add`. Cover file and folder comparison, a saved merge and its backup, application self-tests, and the source build’s CTest suite. Record release and architecture, and give Alfredo the tested commit, source instructions and downloads. Distribute the OpenBSD development artifact for review. Obtain separate authorization for a tagged release or a merge to `main`.
 
 ### Keeping the README in sync
 

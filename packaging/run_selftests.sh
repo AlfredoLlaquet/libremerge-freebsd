@@ -67,7 +67,14 @@ run_one() { # $1 = selftest name, $2/$3[/$4] = files
   # LM4FBS REPLACEMENT
   name=$1
   shift
-  if "$BIN" "--$name" "$@" > "$TMP/output.txt" 2>&1; then
+  set -- "$BIN" "--$name" "$@"
+  if [ "${LIBREMERGE_LANGUAGE+x}" = x ]; then
+    # BSD sh may keep a function's leading assignment local. Pass the selected
+    # catalog to the application explicitly, and show which one was exercised.
+    set -- env "LIBREMERGE_LANGUAGE=$LIBREMERGE_LANGUAGE" "$@"
+    name="$name [$LIBREMERGE_LANGUAGE]"
+  fi
+  if "$@" > "$TMP/output.txt" 2>&1; then
     echo "ok: $name"
   else
     echo "FAIL: $name (exit $?)"
