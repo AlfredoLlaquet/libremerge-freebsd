@@ -148,7 +148,11 @@ extern "C" void moved_block_analysis(struct change ** pscript, struct file_data 
 		// extend moved block upward as far as possible
 		int i1 = i-1;
 		int j1 = j-1;
-		for ( ; i1>=e->line0; --i1, --j1)
+// LM4FBS BEGIN — A moved block can touch the beginning of either file.
+//		for ( ; i1>=e->line0; --i1, --j1)
+// LM4FBS REPLACEMENT
+		for ( ; i1 >= e->line0 && j1 >= 0; --i1, --j1)
+// LM4FBS END
 		{
 			EqGroup * pgroup0 = map.find(fd[0].equivs[i1]);
 			EqGroup * pgroup1 = map.find(fd[1].equivs[j1]);
@@ -164,7 +168,11 @@ extern "C" void moved_block_analysis(struct change ** pscript, struct file_data 
 		// extend moved block downward as far as possible
 		int i2 = i+1;
 		int j2 = j+1;
-		for ( ; i2-(e->line0) < (e->deleted); ++i2,++j2)
+// LM4FBS BEGIN — Extend only while both files have a remaining line.
+//		for ( ; i2-(e->line0) < (e->deleted); ++i2,++j2)
+// LM4FBS REPLACEMENT
+		for ( ; i2 - e->line0 < e->deleted && j2 < fd[1].buffered_lines; ++i2, ++j2)
+// LM4FBS END
 		{
 			EqGroup * pgroup0 = map.find(fd[0].equivs[i2]);
 			EqGroup * pgroup1 = map.find(fd[1].equivs[j2]);
@@ -266,7 +274,11 @@ extern "C" void moved_block_analysis(struct change ** pscript, struct file_data 
 		// extend moved block upward as far as possible
 		int i1 = i-1;
 		int j1 = j-1;
-		for ( ; j1>=e->line1; --i1, --j1)
+// LM4FBS BEGIN — Apply the same boundary when scanning from the right file.
+//		for ( ; j1>=e->line1; --i1, --j1)
+// LM4FBS REPLACEMENT
+		for ( ; j1 >= e->line1 && i1 >= 0; --i1, --j1)
+// LM4FBS END
 		{
 			EqGroup * pgroup0 = map.find(fd[0].equivs[i1]);
 			EqGroup * pgroup1 = map.find(fd[1].equivs[j1]);
@@ -282,7 +294,11 @@ extern "C" void moved_block_analysis(struct change ** pscript, struct file_data 
 		// extend moved block downward as far as possible
 		int i2 = i+1;
 		int j2 = j+1;
-		for ( ; j2-(e->line1) < (e->inserted); ++i2,++j2)
+// LM4FBS BEGIN — Stop at the last buffered line of the left file.
+//		for ( ; j2-(e->line1) < (e->inserted); ++i2,++j2)
+// LM4FBS REPLACEMENT
+		for ( ; j2 - e->line1 < e->inserted && i2 < fd[0].buffered_lines; ++i2, ++j2)
+// LM4FBS END
 		{
 			EqGroup * pgroup0 = map.find(fd[0].equivs[i2]);
 			EqGroup * pgroup1 = map.find(fd[1].equivs[j2]);

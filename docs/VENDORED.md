@@ -48,6 +48,8 @@ decoder leaves those files to it, a PDF's pages are the image's pages and
 both are drawn at Image > Vector Image Scaling. Windows metafiles have no
 reader here.
 
+The November 26, 2026 downstream change to `engine/Src/MovedBlocks.cpp` stops extending a matched block when it reaches the first or last line of either file. Both scan directions use the same rule. The location-pane application test checks that a moved block is displayed and connected to its matching lines.
+
 ## Tree-sitter grammars
 
 WinMerge colors files through Tree-sitter too, in the order its highlight

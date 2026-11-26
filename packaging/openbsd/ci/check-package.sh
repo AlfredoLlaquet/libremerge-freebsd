@@ -25,6 +25,7 @@ pkg_info -e "$pkgname"
 pkg_info -L "$pkgname" > installed-files
 grep -Fx /usr/local/bin/libremerge installed-files
 grep -Fx /usr/local/share/applications/libremerge.desktop installed-files
+ldd /usr/local/bin/libremerge
 
 useradd -m -s /bin/ksh lmtest
 install -m 644 check-installed.sh run_selftests.sh /home/lmtest/

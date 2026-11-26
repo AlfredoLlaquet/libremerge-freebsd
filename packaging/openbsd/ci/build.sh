@@ -9,6 +9,12 @@ export PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/X1
 
 uname -a
 df -h /home /usr /usr/local
+# A literal release package directory skips pkg_add's automatic packages-stable
+# lookup. Its library versions match the signed ports.tar.gz used below.
+mirror=https://cdn.openbsd.org/pub/OpenBSD/8.0
+export PKG_PATH="$mirror/packages/amd64/"
+pkg_info -q
+pkg_add -I -u -D downgrade
 pkg_add -I git cmake ninja qt6-qtbase qt6-qtsvg qt6-qtimageformats \
     qt6-qttranslations boost icu4c re2c libarchive gtest pcre2 libutf8proc vulkan-headers
 
@@ -38,7 +44,6 @@ su -l lmbuild -c '
 # Verify the ports release against the base system's trusted OpenBSD key.
 mkdir -p /home/ports-download
 cd /home/ports-download
-mirror=https://cdn.openbsd.org/pub/OpenBSD/8.0
 ftp -o ports.tar.gz "$mirror/ports.tar.gz"
 ftp -o SHA256.sig "$mirror/SHA256.sig"
 signify -C -p /etc/signify/openbsd-80-base.pub -x SHA256.sig ports.tar.gz
@@ -53,6 +58,8 @@ port=$(sh "$src/packaging/openbsd/prepare-port.sh" "$1" /home/ports-work)
 cd "$port"
 # Only dependencies may come from the mirrors. Build this commit from its distfile.
 make FETCH_PACKAGES= prepare install-depends
+# Compare the installed and ports-tree library versions before compiling the port.
+make wantlib-args
 make FETCH_PACKAGES=No package
 make lib-depends-check
 package=$(make show=PKGFILE)

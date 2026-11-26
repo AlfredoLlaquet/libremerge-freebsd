@@ -20,7 +20,9 @@ The build can run offline after its system dependencies are installed. To instal
 
 ## Produce the binary package
 
-Use the ports tree that matches the OpenBSD release. If `/usr/ports` is already populated with the 8.0 release tree, proceed to the packaging commands below. To install the release tree on a fresh 8.0 machine, fetch and verify it as a regular user, then extract it as root.
+Use a clean OpenBSD 8.0 amd64 build environment for a distributable 8.0 package. The release ports tree and the libraries installed in the build environment must agree. OpenBSD's regular package mirror also offers stable updates, which can have newer library versions. The build uses the original release packages as its minimum library versions. People installing LibreMerge can use the normal mirror with current updates.
+
+If `/usr/ports` already contains the 8.0 release tree, proceed to the packaging commands below. To install it on a fresh 8.0 machine, fetch and verify it as a regular user, then extract it as root.
 
 ```sh
 mkdir -p ~/ports-download && cd ~/ports-download
@@ -30,9 +32,10 @@ signify -C -p /etc/signify/openbsd-80-base.pub -x SHA256.sig ports.tar.gz
 su root -c 'tar -C /usr -xzf ports.tar.gz'
 ```
 
-In a root shell, start in the directory containing the verified LibreMerge source archive and its unpacked `libremerge-1.5.0` directory. Put the work directory on a filesystem with room for the extracted source and compilation. The helper prints the path to a new overlay and uses the release ports tree to resolve dependencies. On a system configured with `PORTS_PRIVSEP=Yes`, the work directory’s parent must be accessible to the ports build users. The helper applies the framework’s ownership settings inside the new work directory.
+In a root shell, start in the directory containing the verified LibreMerge source archive and its unpacked `libremerge-1.5.0` directory. Set `PKG_PATH` before installing any build dependencies on this machine. The literal release URL selects the package set that matches `ports.tar.gz`. Put the work directory on a filesystem with room for the extracted source and compilation. On systems configured with `PORTS_PRIVSEP=Yes`, its parent must be accessible to the ports build users. The helper applies the framework’s ownership settings inside the new work directory.
 
 ```sh
+export PKG_PATH=https://cdn.openbsd.org/pub/OpenBSD/8.0/packages/amd64/
 archive="$PWD/libremerge-1.5.0-source.tar.gz"
 port=$(sh libremerge-1.5.0/packaging/openbsd/prepare-port.sh "$archive" /usr/local/pobj)
 cd "$port"

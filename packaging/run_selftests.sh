@@ -65,14 +65,18 @@ run_one() { # $1 = selftest name, $2/$3[/$4] = files
   #   else
   #     echo "FAIL: $1 (exit $?)"
   # LM4FBS REPLACEMENT
-  name=$1
-  shift
-  set -- "$BIN" "--$name" "$@"
-  if [ "${LIBREMERGE_LANGUAGE+x}" = x ]; then
-    # BSD sh may keep a function's leading assignment local. Pass the selected
-    # catalog to the application explicitly, and show which one was exercised.
-    set -- env "LIBREMERGE_LANGUAGE=$LIBREMERGE_LANGUAGE" "$@"
-    name="$name [$LIBREMERGE_LANGUAGE]"
+  # Prefix assignments on shell functions have different lifetimes on the BSDs.
+  # Only the application process receives an explicit language override.
+  if [ "$1" = --language ]; then
+    catalog=$2
+    name=$3
+    shift 3
+    set -- env "LIBREMERGE_LANGUAGE=$catalog" "$BIN" "--$name" "$@"
+    name="$name [$catalog]"
+  else
+    name=$1
+    shift
+    set -- "$BIN" "--$name" "$@"
   fi
   if "$@" > "$TMP/output.txt" 2>&1; then
     echo "ok: $name"
@@ -138,11 +142,17 @@ run_one selftest-folder-content
 run_one selftest-compare-methods
 run_one selftest-show-filters
 # native menu check: runs under cocoa (dmg validation), skips offscreen
-LIBREMERGE_LANGUAGE=pt_BR run_one selftest-app-menu
-LIBREMERGE_LANGUAGE=de run_one selftest-app-menu
-LIBREMERGE_LANGUAGE=es run_one selftest-app-menu
-LIBREMERGE_LANGUAGE=ca run_one selftest-app-menu
-LIBREMERGE_LANGUAGE=fr run_one selftest-app-menu
+# LM4FBS BEGIN — Scope the override to each catalog under test.
+# LIBREMERGE_LANGUAGE=pt_BR run_one selftest-app-menu
+# LIBREMERGE_LANGUAGE=de run_one selftest-app-menu
+# LIBREMERGE_LANGUAGE=es run_one selftest-app-menu
+# LIBREMERGE_LANGUAGE=ca run_one selftest-app-menu
+# LIBREMERGE_LANGUAGE=fr run_one selftest-app-menu
+# LM4FBS REPLACEMENT
+for lang in pt_BR de es ca fr; do
+  run_one --language "$lang" selftest-app-menu
+done
+# LM4FBS END
 run_one selftest-about
 run_one selftest-options
 run_one selftest-general-options
@@ -170,19 +180,33 @@ run_one selftest-display-filter
 run_one selftest-line-filter
 run_one selftest-theme
 run_one selftest-menu-roles
-LIBREMERGE_LANGUAGE=pt_BR run_one selftest-qt-i18n
-LIBREMERGE_LANGUAGE=de run_one selftest-qt-i18n
-LIBREMERGE_LANGUAGE=es run_one selftest-qt-i18n
-LIBREMERGE_LANGUAGE=ca run_one selftest-qt-i18n
-LIBREMERGE_LANGUAGE=fr run_one selftest-qt-i18n
+# LM4FBS BEGIN — Scope the override to each catalog under test.
+# LIBREMERGE_LANGUAGE=pt_BR run_one selftest-qt-i18n
+# LIBREMERGE_LANGUAGE=de run_one selftest-qt-i18n
+# LIBREMERGE_LANGUAGE=es run_one selftest-qt-i18n
+# LIBREMERGE_LANGUAGE=ca run_one selftest-qt-i18n
+# LIBREMERGE_LANGUAGE=fr run_one selftest-qt-i18n
+# LM4FBS REPLACEMENT
+for lang in pt_BR de es ca fr; do
+  run_one --language "$lang" selftest-qt-i18n
+done
+# LM4FBS END
 # the accelerator letters of the menus, one item each, in every catalog
 # (English keeps WinMerge's letters as they stand)
 for lang in pt_BR de es ca fr; do
-  LIBREMERGE_LANGUAGE=$lang run_one selftest-menu-mnemonics
+  # LM4FBS BEGIN
+  #   LIBREMERGE_LANGUAGE=$lang run_one selftest-menu-mnemonics
+  # LM4FBS REPLACEMENT
+  run_one --language "$lang" selftest-menu-mnemonics
+  # LM4FBS END
 done
 # (the request for a star and the Help menu's pages, in every language)
 for lang in en pt_BR de es ca fr; do
-  LIBREMERGE_LANGUAGE=$lang run_one selftest-star-prompt
+  # LM4FBS BEGIN
+  #   LIBREMERGE_LANGUAGE=$lang run_one selftest-star-prompt
+  # LM4FBS REPLACEMENT
+  run_one --language "$lang" selftest-star-prompt
+  # LM4FBS END
 done
 run_one selftest-desktop-integration
 run_one selftest-table "$TMP/left.csv" "$TMP/right.csv"
