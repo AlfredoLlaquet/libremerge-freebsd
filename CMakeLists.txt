@@ -17,15 +17,15 @@ if(APPLE)
   endforeach()
 endif()
 
-# LM4FBS BEGIN — OpenBSD 8.0 packages a Poco older than the engine's API.
+# LM4BSD BEGIN — OpenBSD 8.0 packages a Poco older than the engine's API.
 # find_package(Poco REQUIRED COMPONENTS Foundation)
-# LM4FBS REPLACEMENT
+# LM4BSD REPLACEMENT
 if(CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
   include(packaging/openbsd/OpenBSDDependencies.cmake)
 else()
   find_package(Poco REQUIRED COMPONENTS Foundation)
 endif()
-# LM4FBS END
+# LM4BSD END
 find_package(Boost REQUIRED CONFIG)
 find_package(ICU REQUIRED COMPONENTS uc i18n)
 

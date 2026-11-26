@@ -1,9 +1,9 @@
 #!/bin/sh
-# LM4FBS BEGIN — The executable interpreter directive must occupy line one.
+# LM4BSD BEGIN — The executable interpreter directive must occupy line one.
 # #!/bin/bash
-# LM4FBS REPLACEMENT
+# LM4BSD REPLACEMENT
 # The base-system sh interpreter is selected above.
-# LM4FBS END
+# LM4BSD END
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Run the app's headless selftest suite against a given binary.
 # Usage: run_selftests.sh <libremerge-binary>
@@ -15,14 +15,14 @@ export QT_QPA_PLATFORM="${QT_QPA_PLATFORM:-offscreen}"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
-# LM4FBS BEGIN ADDITION — OpenBSD ships its base64 decoder as b64decode.
+# LM4BSD BEGIN ADDITION — OpenBSD ships its base64 decoder as b64decode.
 if ! command -v base64 >/dev/null 2>&1; then
   base64() {
     [ "$#" -eq 1 ] && [ "$1" = -d ] || return 2
     b64decode -r
   }
 fi
-# LM4FBS END
+# LM4BSD END
 
 make_fixtures() {
   awk 'BEGIN{for(i=1;i<=800;i++) print "line " i " common text here"}' \
@@ -59,12 +59,12 @@ PNG
 fails=0
 run_one() { # $1 = selftest name, $2/$3[/$4] = files
   make_fixtures
-  # LM4FBS BEGIN — Run the suite with the shell shipped by either BSD.
+  # LM4BSD BEGIN — Run the suite with the shell shipped by either BSD.
   #   if "$BIN" "--$1" "${@:2}" > "$TMP/output.txt" 2>&1; then
   #     echo "ok: $1"
   #   else
   #     echo "FAIL: $1 (exit $?)"
-  # LM4FBS REPLACEMENT
+  # LM4BSD REPLACEMENT
   # Prefix assignments on shell functions have different lifetimes on the BSDs.
   # Only the application process receives an explicit language override.
   if [ "$1" = --language ]; then
@@ -82,7 +82,7 @@ run_one() { # $1 = selftest name, $2/$3[/$4] = files
     echo "ok: $name"
   else
     echo "FAIL: $name (exit $?)"
-  # LM4FBS END
+  # LM4BSD END
     # what it printed, Qt's own messages left out
     grep -v '^qt\.' "$TMP/output.txt" | tail -n 40 | sed 's/^/    /'
     fails=$((fails + 1))
@@ -142,17 +142,17 @@ run_one selftest-folder-content
 run_one selftest-compare-methods
 run_one selftest-show-filters
 # native menu check: runs under cocoa (dmg validation), skips offscreen
-# LM4FBS BEGIN — Scope the override to each catalog under test.
+# LM4BSD BEGIN — Scope the override to each catalog under test.
 # LIBREMERGE_LANGUAGE=pt_BR run_one selftest-app-menu
 # LIBREMERGE_LANGUAGE=de run_one selftest-app-menu
 # LIBREMERGE_LANGUAGE=es run_one selftest-app-menu
 # LIBREMERGE_LANGUAGE=ca run_one selftest-app-menu
 # LIBREMERGE_LANGUAGE=fr run_one selftest-app-menu
-# LM4FBS REPLACEMENT
+# LM4BSD REPLACEMENT
 for lang in pt_BR de es ca fr; do
   run_one --language "$lang" selftest-app-menu
 done
-# LM4FBS END
+# LM4BSD END
 run_one selftest-about
 run_one selftest-options
 run_one selftest-general-options
@@ -180,33 +180,33 @@ run_one selftest-display-filter
 run_one selftest-line-filter
 run_one selftest-theme
 run_one selftest-menu-roles
-# LM4FBS BEGIN — Scope the override to each catalog under test.
+# LM4BSD BEGIN — Scope the override to each catalog under test.
 # LIBREMERGE_LANGUAGE=pt_BR run_one selftest-qt-i18n
 # LIBREMERGE_LANGUAGE=de run_one selftest-qt-i18n
 # LIBREMERGE_LANGUAGE=es run_one selftest-qt-i18n
 # LIBREMERGE_LANGUAGE=ca run_one selftest-qt-i18n
 # LIBREMERGE_LANGUAGE=fr run_one selftest-qt-i18n
-# LM4FBS REPLACEMENT
+# LM4BSD REPLACEMENT
 for lang in pt_BR de es ca fr; do
   run_one --language "$lang" selftest-qt-i18n
 done
-# LM4FBS END
+# LM4BSD END
 # the accelerator letters of the menus, one item each, in every catalog
 # (English keeps WinMerge's letters as they stand)
 for lang in pt_BR de es ca fr; do
-  # LM4FBS BEGIN
+  # LM4BSD BEGIN
   #   LIBREMERGE_LANGUAGE=$lang run_one selftest-menu-mnemonics
-  # LM4FBS REPLACEMENT
+  # LM4BSD REPLACEMENT
   run_one --language "$lang" selftest-menu-mnemonics
-  # LM4FBS END
+  # LM4BSD END
 done
 # (the request for a star and the Help menu's pages, in every language)
 for lang in en pt_BR de es ca fr; do
-  # LM4FBS BEGIN
+  # LM4BSD BEGIN
   #   LIBREMERGE_LANGUAGE=$lang run_one selftest-star-prompt
-  # LM4FBS REPLACEMENT
+  # LM4BSD REPLACEMENT
   run_one --language "$lang" selftest-star-prompt
-  # LM4FBS END
+  # LM4BSD END
 done
 run_one selftest-desktop-integration
 run_one selftest-table "$TMP/left.csv" "$TMP/right.csv"

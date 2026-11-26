@@ -1,4 +1,4 @@
-# LM4FBS BEGIN ADDITION — Private dependencies for the OpenBSD source build and port.
+# LM4BSD BEGIN ADDITION — Private dependencies for the OpenBSD source build and port.
 set(LM_OPENBSD_DISTFILES "${CMAKE_BINARY_DIR}/_deps/openbsd-distfiles" CACHE PATH
   "Directory containing the OpenBSD dependency sources and grammar archives")
 set(LM_TREE_SITTER_DOWNLOAD_DIR "${LM_OPENBSD_DISTFILES}" CACHE PATH
@@ -70,4 +70,4 @@ set(LEMON_TEMPLATE "${LM_OPENBSD_DISTFILES}/lempar-3.54.1.c")
 include(GNUInstallDirs)
 install(FILES "${CMAKE_CURRENT_LIST_DIR}/openbsd-dependencies.txt"
   DESTINATION "${CMAKE_INSTALL_DATADIR}/doc/libremerge")
-# LM4FBS END
+# LM4BSD END

@@ -98,7 +98,7 @@ puts WinMerge's own queries for C and C++ in place of the bundled ones:
 `custom_queries`, written by WinMerge's maintainer (the repository states
 no license), kept in `engine/Externals/tree-sitter-grammars/custom_queries`.
 
-<!-- LM4FBS BEGIN ADDITION -->
+<!-- LM4BSD BEGIN ADDITION -->
 ## OpenBSD build dependencies
 
 OpenBSD 8.0 ships Poco 1.4.6, which lacks the timestamp API used by the
@@ -122,7 +122,7 @@ The OpenBSD source bundle includes these inputs and the grammar archives in
 uses that directory and checks the pins before building. When updating a
 dependency, update the pin, review the OpenBSD patch and the notices, and
 verify both a fresh source build and an offline ports build.
-<!-- LM4FBS END -->
+<!-- LM4BSD END -->
 
 ## Translations
 

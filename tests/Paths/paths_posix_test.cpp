@@ -16,7 +16,7 @@ class PathTestPosix : public testing::Test
 {
 };
 
-// LM4FBS BEGIN ADDITION — A relative fixture path can also resolve through the test working directory.
+// LM4BSD BEGIN ADDITION — A relative fixture path can also resolve through the test working directory.
 #if defined(__FreeBSD__) || defined(__OpenBSD__)
 TEST_F(PathTestPosix, ProgramDirectoryContainsTheRunningTestBinary)
 {
@@ -26,7 +26,7 @@ TEST_F(PathTestPosix, ProgramDirectoryContainsTheRunningTestBinary)
 	EXPECT_EQ(::access(executable.c_str(), X_OK), 0) << executable;
 }
 #endif
-// LM4FBS END
+// LM4BSD END
 
 TEST_F(PathTestPosix, EndsWithSlash)
 {

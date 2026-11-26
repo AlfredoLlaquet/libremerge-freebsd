@@ -1,5 +1,5 @@
 #!/bin/sh
-# LM4FBS BEGIN ADDITION — Check an installation as a regular desktop user.
+# LM4BSD BEGIN ADDITION — Check an installation as a regular desktop user.
 set -eu
 selftests=$1
 build=${2:-}
@@ -60,4 +60,4 @@ for zone in UTC Europe/Madrid; do
   export TZ
   check_installation
 done
-# LM4FBS END
+# LM4BSD END

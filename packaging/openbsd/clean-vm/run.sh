@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# LM4FBS BEGIN ADDITION — Install stock OpenBSD on a new disk for each binary test.
+# LM4BSD BEGIN ADDITION — Install stock OpenBSD on a new disk for each binary test.
 set -euo pipefail
 
 payload=$(realpath "${1:?usage: run.sh PAYLOAD_DIRECTORY GUEST_SCRIPT}")
@@ -111,4 +111,4 @@ test "$(machine -a)" = amd64
 OPENBSD
 tar -C "$payload" -cf - . | "${ssh_guest[@]}" 'mkdir /root/test && cd /root/test && tar -xf -'
 "${ssh_guest[@]}" "cd /root/test && exec /bin/sh ./$script"
-# LM4FBS END
+# LM4BSD END

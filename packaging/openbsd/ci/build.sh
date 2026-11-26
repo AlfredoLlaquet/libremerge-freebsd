@@ -1,5 +1,5 @@
 #!/bin/sh
-# LM4FBS BEGIN ADDITION — Run only in the disposable OpenBSD build VM.
+# LM4BSD BEGIN ADDITION — Run only in the disposable OpenBSD build VM.
 set -eu
 test "$(uname -sr)" = "OpenBSD 8.0"
 test "$(machine -a)" = amd64
@@ -67,4 +67,4 @@ cp "$package" "$workspace/out/"
 cd "$workspace/out"
 sha256 *.tgz *-source.tar.gz > SHA256
 sha256 -C SHA256 *.tgz *-source.tar.gz
-# LM4FBS END
+# LM4BSD END

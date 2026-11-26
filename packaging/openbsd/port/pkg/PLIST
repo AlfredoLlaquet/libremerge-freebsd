@@ -1,4 +1,4 @@
-@comment LM4FBS BEGIN ADDITION
+@comment LM4BSD BEGIN ADDITION
 @bin bin/libremerge
 lib/libremerge/
 lib/libremerge/TreeSitterGrammars/
@@ -159,4 +159,4 @@ share/metainfo/
 share/metainfo/io.github.iagodpassos.libremerge.appdata.xml
 @tag update-desktop-database
 @tag gtk-update-icon-cache %D/share/icons/hicolor
-@comment LM4FBS END
+@comment LM4BSD END

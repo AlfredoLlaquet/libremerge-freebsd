@@ -14,12 +14,12 @@
 #include "OptionsDef.h"
 #include "MergeApp.h"
 
-// LM4FBS BEGIN ADDITION
+// LM4BSD BEGIN ADDITION
 #if defined(__FreeBSD__) || defined(__OpenBSD__)
 #include <cstdlib>
 #include <ctime>
 #endif
-// LM4FBS END
+// LM4BSD END
 
 #pragma execution_character_set("utf-8")
 
@@ -4645,7 +4645,7 @@ TEST_P(FilterExpressionTest, ContainsWhateverTheCase)
 	EXPECT_TRUE(fe.Evaluate(di));
 }
 
-// LM4FBS BEGIN ADDITION — Check historical local times against independently specified UTC instants.
+// LM4BSD BEGIN ADDITION — Check historical local times against independently specified UTC instants.
 #if defined(__FreeBSD__) || defined(__OpenBSD__)
 TEST_P(FilterExpressionTest, LocalFiltersUseTheOffsetOfTheDate)
 {
@@ -4716,7 +4716,7 @@ TEST_P(FilterExpressionTest, LocalFiltersUseTheOffsetOfTheDate)
 	check(R"(startOfYear(d"2025-07-12 12:34:56") == LeftDate)", Poco::DateTime(2024, 12, 31, 23));
 }
 #endif
-// LM4FBS END
+// LM4BSD END
 
 INSTANTIATE_TEST_SUITE_P(
 	OptimizationCases,

@@ -39,11 +39,11 @@
   <launchable type="desktop-id">libremerge.desktop</launchable>
 
   <url type="homepage">https://github.com/iagodpassos/libremerge</url>
-  <!-- LM4FBS BEGIN — Direct support for this fork to its repository. -->
+  <!-- LM4BSD BEGIN — Direct support for this fork to its repository. -->
   <!-- <url type="bugtracker">https://github.com/iagodpassos/libremerge/issues</url> -->
-  <!-- LM4FBS REPLACEMENT -->
+  <!-- LM4BSD REPLACEMENT -->
   <url type="help">https://github.com/AlfredoLlaquet/libremerge-freebsd</url>
-  <!-- LM4FBS END -->
+  <!-- LM4BSD END -->
   <url type="donation">https://buymeacoffee.com/iagodpassos</url>
 
   <developer id="io.github.iagodpassos">

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# LM4FBS BEGIN ADDITION — Stage a FreeBSD Release build as a native pkg archive.
+# LM4BSD BEGIN ADDITION — Stage a FreeBSD Release build as a native pkg archive.
 import json
 import os
 from pathlib import Path
@@ -71,4 +71,4 @@ def create_package(build, version, destination):
 if __name__ == "__main__":
     build, version, dest = sys.argv[1:]
     create_package(Path(build).resolve(), version, Path(dest).resolve())
-# LM4FBS END
+# LM4BSD END

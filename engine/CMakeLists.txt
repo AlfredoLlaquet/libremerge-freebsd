@@ -151,12 +151,12 @@ add_custom_command(
   COMMAND ${LEMON_EXECUTABLE} ${LEMON_TEMPLATE_ARG} ${FILTER_GEN_DIR}/FilterParser.y
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Src/FilterEngine/FilterParser.y
   COMMENT "lemon: FilterParser.y -> FilterParser.c")
-# LM4FBS BEGIN ADDITION — Regenerate when the private OpenBSD Lemon or its template changes.
+# LM4BSD BEGIN ADDITION — Regenerate when the private OpenBSD Lemon or its template changes.
 if(CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
   add_custom_command(OUTPUT ${FILTER_GEN_DIR}/FilterParser.c APPEND
     DEPENDS libremerge-lemon "${LEMON_TEMPLATE}")
 endif()
-# LM4FBS END
+# LM4BSD END
 file(GLOB CRYSTAL_PARSER_SOURCES CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/Externals/crystaledit/editlib/parsers/*.cpp)
 list(APPEND L2_SOURCES

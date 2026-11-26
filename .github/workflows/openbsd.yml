@@ -1,4 +1,4 @@
-# LM4FBS BEGIN ADDITION
+# LM4BSD BEGIN ADDITION
 name: OpenBSD
 
 on: [push, pull_request, workflow_dispatch]
@@ -70,4 +70,4 @@ jobs:
           path: downloads/
           if-no-files-found: error
           compression-level: 0
-# LM4FBS END
+# LM4BSD END

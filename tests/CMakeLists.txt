@@ -87,10 +87,10 @@ gtest_discover_tests(libremerge-tests
   DISCOVERY_TIMEOUT 60
 )
 
-# LM4FBS BEGIN ADDITION — FreeBSD sh and OpenBSD sh scope function environments differently.
+# LM4BSD BEGIN ADDITION — FreeBSD sh and OpenBSD sh scope function environments differently.
 if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD" OR CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
   add_test(NAME SelftestRunner.LanguageEnvironment
     COMMAND /bin/sh "${CMAKE_CURRENT_SOURCE_DIR}/selftest-languages.sh"
             "${CMAKE_SOURCE_DIR}/packaging/run_selftests.sh")
 endif()
-# LM4FBS END
+# LM4BSD END

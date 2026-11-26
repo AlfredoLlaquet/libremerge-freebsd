@@ -1,5 +1,5 @@
 #!/bin/sh
-# LM4FBS BEGIN ADDITION — Archive the exact Git commit and its verified inputs.
+# LM4BSD BEGIN ADDITION — Archive the exact Git commit and its verified inputs.
 set -eu
 if [ "$#" -ne 2 ]; then
     echo "Usage: $0 configured-openbsd-distfiles-directory output-directory" >&2
@@ -49,4 +49,4 @@ git -C "$repo" archive --format=tar.gz --output="$work/$filename" \
     "$@" "--prefix=$distname/" "$commit"
 mv "$work/$filename" "$out/$filename"
 printf '%s\n' "$out/$filename"
-# LM4FBS END
+# LM4BSD END

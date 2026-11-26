@@ -1,5 +1,5 @@
 #!/bin/sh
-# LM4FBS BEGIN ADDITION — Give each candidate its own standard ports overlay.
+# LM4BSD BEGIN ADDITION — Give each candidate its own standard ports overlay.
 set -eu
 if [ "$#" -ne 2 ]; then
     echo "Usage: $0 libremerge-VERSION-source.tar.gz work-parent-directory" >&2
@@ -51,4 +51,4 @@ make makesum >&2
 make checksum >&2
 trap - EXIT HUP INT TERM
 printf '%s\n' "$port"
-# LM4FBS END
+# LM4BSD END

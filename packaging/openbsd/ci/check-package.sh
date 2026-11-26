@@ -1,5 +1,5 @@
 #!/bin/sh
-# LM4FBS BEGIN ADDITION — Check the downloaded package on a new OpenBSD installation.
+# LM4BSD BEGIN ADDITION — Check the downloaded package on a new OpenBSD installation.
 set -eu
 test "$(uname -sr)" = "OpenBSD 8.0"
 test "$(machine -a)" = amd64
@@ -34,4 +34,4 @@ su -l lmtest -c '
     QT_QPA_PLATFORM=offscreen /usr/local/bin/libremerge --version
     sh "$HOME/check-installed.sh" "$HOME/run_selftests.sh"
 '
-# LM4FBS END
+# LM4BSD END

@@ -1,5 +1,5 @@
 #!/bin/sh
-# LM4FBS BEGIN ADDITION — Exercise both documented paths on a fresh VM.
+# LM4BSD BEGIN ADDITION — Exercise both documented paths on a fresh VM.
 set -eu
 scripts=$PWD/packaging/freebsd
 . "$scripts/release.conf"
@@ -33,4 +33,4 @@ pkg check -dns libremerge
 
 pkg install -y bash xorg-vfbserver dejavu
 su lmtest -c "sh '$scripts/check-installed.sh' '$selftests'"
-# LM4FBS END
+# LM4BSD END

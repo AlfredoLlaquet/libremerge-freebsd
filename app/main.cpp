@@ -517,10 +517,10 @@ int main(int argc, char *argv[])
 	}
 
 	QCommandLineParser parser;
-// LM4FBS BEGIN — Identify the native platform in the extended command-line help.
+// LM4BSD BEGIN — Identify the native platform in the extended command-line help.
 // 	parser.setApplicationDescription(
 // 		QStringLiteral("A free differencing and merging tool for macOS and Linux"));
-// LM4FBS REPLACEMENT
+// LM4BSD REPLACEMENT
 #ifdef Q_OS_FREEBSD
 	parser.setApplicationDescription(
 		QStringLiteral("A free differencing and merging tool for FreeBSD"));
@@ -531,7 +531,7 @@ int main(int argc, char *argv[])
 	parser.setApplicationDescription(
 		QStringLiteral("A free differencing and merging tool for macOS and Linux"));
 #endif
-// LM4FBS END
+// LM4BSD END
 	parser.addHelpOption();
 	parser.addVersionOption();
 	parser.addPositionalArgument(QStringLiteral("left"), QStringLiteral("Left file"), QStringLiteral("[left]"));
@@ -1513,14 +1513,14 @@ int main(int argc, char *argv[])
 			check(fine, "Help: the project's page, its issues and the call for translators, above About");
 			if (!shots.isEmpty() && help != nullptr)
 				help->grab().save(QStringLiteral("%1/star-%2-help.png").arg(shots, language));
-// LM4FBS BEGIN — Check the downstream destinations without opening the browser.
+// LM4BSD BEGIN — Check the downstream destinations without opening the browser.
 // 			const QString home = QStringLiteral("https://github.com/iagodpassos/libremerge");
 // 			check(lm::projectPage() == QUrl(home)
 // 				&& lm::projectIssuesPage() == QUrl(home + QStringLiteral("/issues"))
 // 				&& lm::projectTranslationsPage().toString().startsWith(home + QStringLiteral("/issues/"))
 // 				&& AboutDialog::homepageUrl() == lm::projectPage(),
 // 				"the pages are the project's own, the About box's among them");
-// LM4FBS REPLACEMENT
+// LM4BSD REPLACEMENT
 #if defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
 			const QUrl home(QStringLiteral("https://github.com/AlfredoLlaquet/libremerge-freebsd"));
 			check(lm::projectPage() == home && lm::projectIssuesPage() == home
@@ -1534,7 +1534,7 @@ int main(int argc, char *argv[])
 				&& AboutDialog::homepageUrl() == lm::projectPage(),
 				"the pages are the project's own, the About box's among them");
 #endif
-// LM4FBS END
+// LM4BSD END
 		}
 
 		// --- the texts, in the catalog of the language in use ---
@@ -11505,13 +11505,13 @@ int main(int argc, char *argv[])
 			&& !AboutDialog::platformText().isEmpty()
 			&& AboutDialog::homepageUrl().host() == QStringLiteral("github.com")
 			&& !contributors.isEmpty();
-// LM4FBS BEGIN ADDITION
+// LM4BSD BEGIN ADDITION
 #ifdef Q_OS_FREEBSD
 		ok = ok && AboutDialog::platformText().startsWith(QStringLiteral("FreeBSD "));
 #elif defined(Q_OS_OPENBSD)
 		ok = ok && AboutDialog::platformText().startsWith(QStringLiteral("OpenBSD "));
 #endif
-// LM4FBS END
+// LM4BSD END
 		for (const QString &name : mustCredit)
 			if (!contributors.contains(name))
 			{
@@ -11607,11 +11607,11 @@ int main(int argc, char *argv[])
 
 	if (parser.isSet(selftestFolder3OpsOpt))
 	{
-// LM4FBS BEGIN ADDITION — Report a failed file operation even on a headless test run.
+// LM4BSD BEGIN ADDITION — Report a failed file operation even on a headless test run.
 #if defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
 		lm::setUnattended(true);
 #endif
-// LM4FBS END
+// LM4BSD END
 		// WinMerge's 3-way DirView operations: pairwise copies leave the
 		// row "not compared", deletes recompute from existence and drop
 		// rows that ran out of sides

@@ -1,5 +1,5 @@
 #!/bin/sh
-# LM4FBS BEGIN ADDITION — Verify the actual language each child process receives.
+# LM4BSD BEGIN ADDITION — Verify the actual language each child process receives.
 set -eu
 case "$1" in
     --selftest-*)
@@ -37,4 +37,4 @@ for inherited in UNSET ambient; do
     diff -u "$work/expected" "$work/explicit"
     grep -Fx -- "--selftest-options $inherited" "$LM_LANGUAGE_TRACE"
 done
-# LM4FBS END
+# LM4BSD END

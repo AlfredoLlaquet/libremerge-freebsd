@@ -1,4 +1,4 @@
-# LM4FBS BEGIN ADDITION — Local OpenBSD port of the complete candidate source.
+# LM4BSD BEGIN ADDITION — Local OpenBSD port of the complete candidate source.
 COMMENT =		graphical file and folder comparison and merging
 DISTNAME =		libremerge-1.5.0
 CATEGORIES =		textproc
@@ -48,4 +48,4 @@ post-install:
 	    ${PREFIX}/share/licenses/libremerge/xdiff-COPYING
 
 .include <bsd.port.mk>
-# LM4FBS END
+# LM4BSD END

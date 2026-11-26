@@ -1,13 +1,13 @@
-# LM4FBS BEGIN ADDITION — Private Poco Foundation 1.15.4, OpenBSD, 2026-11-26.
+# LM4BSD BEGIN ADDITION — Private Poco Foundation 1.15.4, OpenBSD, 2026-11-26.
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -20,6 +20,9 @@
  set(PROJECT_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
  set(RELEASE_NAME "Unstable-trunk")
  
-+# LM4FBS BEGIN ADDITION — Keep the containing project's output layout.
++# LM4BSD BEGIN ADDITION — Keep the containing project's output layout.
 +if(PROJECT_IS_TOP_LEVEL)
-+# LM4FBS END
++# LM4BSD END
  # Put the libaries and binaries that get built into directories at the
  # top of the build tree rather than in hard-to-find leaf
  # directories. This simplifies manual testing and the use of the build
@@ -15,9 +15,9 @@
  
  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-+# LM4FBS BEGIN ADDITION
++# LM4BSD BEGIN ADDITION
 +endif()
-+# LM4FBS END
++# LM4BSD END
  
  # Append our module directory to CMake
  list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -25,13 +25,13 @@
  set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
  set(CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
  
-+# LM4FBS BEGIN ADDITION — Packaging belongs to the outer project.
++# LM4BSD BEGIN ADDITION — Packaging belongs to the outer project.
 +if(PROJECT_IS_TOP_LEVEL)
-+# LM4FBS END
++# LM4BSD END
  include(CPack)
-+# LM4FBS BEGIN ADDITION
++# LM4BSD BEGIN ADDITION
 +endif()
-+# LM4FBS END
++# LM4BSD END
  
  #############################################################
  # cmake config files
@@ -41,9 +41,9 @@
  	endif()
  endfunction(poco_enable_detailed_compiler_warnings)
  
-+# LM4FBS BEGIN ADDITION — Keep global postfixes under control of the containing project.
++# LM4BSD BEGIN ADDITION — Keep global postfixes under control of the containing project.
 +if(PROJECT_IS_TOP_LEVEL)
-+# LM4FBS END
++# LM4BSD END
  # Add a d postfix to the debug libraries
  if(BUILD_SHARED_LIBS)
  	set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set Debug library postfix" FORCE)
@@ -51,9 +51,9 @@
  	set(CMAKE_RELWITHDEBINFO_POSTFIX "${STATIC_POSTFIX}" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
  endif()
  
-+# LM4FBS BEGIN ADDITION
++# LM4BSD BEGIN ADDITION
 +endif()
-+# LM4FBS END
++# LM4BSD END
 +
  # OS Detection
  include(CheckTypeSize)
@@ -64,12 +64,12 @@
  			if("${CMAKE_SYSTEM_NAME}" STREQUAL "QNX")
  				target_compile_definitions(Foundation PUBLIC _QNX_SOURCE=1 POCO_HAVE_FD_POLL)
  				target_link_libraries(Foundation PUBLIC m socket)
-+			# LM4FBS BEGIN ADDITION — OpenBSD uses poll(2); thread naming uses a different API.
++			# LM4BSD BEGIN ADDITION — OpenBSD uses poll(2); thread naming uses a different API.
 +			elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "OpenBSD")
 +				target_compile_definitions(Foundation PUBLIC POCO_HAVE_FD_POLL POCO_NO_THREADNAME)
 +				target_link_libraries(Foundation PUBLIC pthread)
-+			# LM4FBS END
++			# LM4BSD END
  			elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
  				target_compile_definitions(Foundation PUBLIC POCO_HAVE_FD_POLL)
  				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt)
-# LM4FBS END
+# LM4BSD END

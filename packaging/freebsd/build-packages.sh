@@ -1,5 +1,5 @@
 #!/bin/sh
-# LM4FBS BEGIN ADDITION — Build each ABI natively and prepare the upgrade fixture.
+# LM4BSD BEGIN ADDITION — Build each ABI natively and prepare the upgrade fixture.
 set -eu
 workspace=$PWD
 scripts=$workspace/packaging/freebsd
@@ -52,4 +52,4 @@ freebsd-version -u > "$out/userland.txt"
 freebsd-version -r > "$out/kernel.txt"
 pkg install -y bash xorg-vfbserver dejavu
 su lmbuild -c "sh '$scripts/check-installed.sh' '$src/packaging/run_selftests.sh' '$src/build'"
-# LM4FBS END
+# LM4BSD END

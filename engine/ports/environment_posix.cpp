@@ -15,10 +15,10 @@
 #include <Poco/Process.h>
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
-// LM4FBS BEGIN ADDITION
+// LM4BSD BEGIN ADDITION
 #elif defined(__FreeBSD__)
 #include <sys/sysctl.h>
-// LM4FBS END
+// LM4BSD END
 #endif
 #include "paths.h"
 #include "unicoder.h"
@@ -91,7 +91,7 @@ String GetProgPath()
 		uint32_t size = sizeof(buf);
 		if (_NSGetExecutablePath(buf, &size) != 0)
 			buf[0] = '\0';
-// LM4FBS BEGIN ADDITION — Find the executable even when procfs is unmounted.
+// LM4BSD BEGIN ADDITION — Find the executable even when procfs is unmounted.
 #elif defined(__FreeBSD__)
 		const int mib[] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1 };
 		size_t size = sizeof(buf);
@@ -100,7 +100,7 @@ String GetProgPath()
 #elif defined(__OpenBSD__)
 		if (getexecpath(buf, sizeof(buf)) == -1)
 			buf[0] = '\0';
-// LM4FBS END
+// LM4BSD END
 #else
 		ssize_t n = readlink("/proc/self/exe", buf, sizeof(buf) - 1);
 		if (n > 0)

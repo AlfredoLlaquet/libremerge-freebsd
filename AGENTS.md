@@ -19,28 +19,28 @@ Programmed by **ChatGPT** for Alfredo Llaquet-Alsina.
 
 ## Marking downstream code changes
 
-Use one pair of `LM4FBS` markers around each logical code block changed for either BSD. Keep the marker words the same in every language and use the file’s own comment syntax. Keep machine-readable manifests, checksums, packing lists, and unmodified third-party sources in their native formats. Add a short reason to the opening marker when it helps explain the change.
+Use one pair of `LM4BSD` markers around each logical code block changed for either BSD. Keep the marker words the same in every language and use the file’s own comment syntax. Keep machine-readable manifests, checksums, packing lists, and unmodified third-party sources in their native formats. Add a short reason to the opening marker when it helps explain the change.
 
-For a replacement, start with `LM4FBS BEGIN` and preserve the complete upstream block immediately below it as comments, retaining its line breaks and indentation. Put `LM4FBS REPLACEMENT` on its own comment line, followed by the active replacement block and then `LM4FBS END`. This C++ example shows the five parts together.
+For a replacement, start with `LM4BSD BEGIN` and preserve the complete upstream block immediately below it as comments, retaining its line breaks and indentation. Put `LM4BSD REPLACEMENT` on its own comment line, followed by the active replacement block and then `LM4BSD END`. This C++ example shows the five parts together.
 
 ```cpp
-// LM4FBS BEGIN — Honor the configured temporary directory.
+// LM4BSD BEGIN — Honor the configured temporary directory.
 // const QString directory = QStringLiteral("/tmp");
 // return QDir(directory).filePath(fileName);
-// LM4FBS REPLACEMENT
+// LM4BSD REPLACEMENT
 const QString directory = QDir::tempPath();
 return QDir(directory).filePath(fileName);
-// LM4FBS END
+// LM4BSD END
 ```
 
-For entirely new code, put the active block directly between `LM4FBS BEGIN ADDITION` and `LM4FBS END`. A CMake addition uses the same markers with `#` comments.
+For entirely new code, put the active block directly between `LM4BSD BEGIN ADDITION` and `LM4BSD END`. A CMake addition uses the same markers with `#` comments.
 
 ```cmake
-# LM4FBS BEGIN ADDITION
+# LM4BSD BEGIN ADDITION
 if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
     message(STATUS "Building LibreMerge for FreeBSD")
 endif()
-# LM4FBS END
+# LM4BSD END
 ```
 
 The commented original must match the upstream revision currently used by this fork. When a later upstream version changes that block, refresh the commented copy and review the active FreeBSD replacement against it as part of the same update.
