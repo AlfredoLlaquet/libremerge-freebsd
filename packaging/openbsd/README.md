@@ -4,7 +4,7 @@ LibreMerge’s local port builds an ordinary OpenBSD package with `bsd.port.mk`.
 
 ## Build from the complete source archive
 
-The package downloads include `libremerge-1.5.0-source.tar.gz` and `SHA256`. The archive contains the source used to build the package, the port recipe, and the pinned copies of Poco Foundation, SQLite Lemon, and the syntax grammars. Save both files in the same directory. With the source-build dependencies listed in the main README installed, run the following as a regular user.
+Download the [complete OpenBSD source archive](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.5.0-bsd.4/libremerge-1.5.0-source.tar.gz) and its [SHA256 file](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.5.0-bsd.4/SHA256). The archive contains the source used to build `libremerge-1.5.0p0.tgz`, the port recipe, and the pinned copies of Poco Foundation, SQLite Lemon, and the syntax grammars. Save both files in the same directory. With the [OpenBSD source-build dependencies](../../README.md#install-on-openbsd-from-source) installed, run the following as a regular user.
 
 ```sh
 sha256 -C SHA256 libremerge-1.5.0-source.tar.gz
@@ -45,7 +45,7 @@ make lib-depends-check
 make show=PKGFILE
 ```
 
-The first `make` installs build and runtime dependencies from the OpenBSD package mirrors. The second turns off binary fetching for LibreMerge itself and builds the candidate from the supplied archive. The framework stages the installation and checks the packing list. `lib-depends-check` verifies its shared library declarations, and the last command prints the full path to `libremerge-1.5.0.tgz`.
+The first `make` installs build and runtime dependencies from the OpenBSD package mirrors. The second turns off binary fetching for LibreMerge itself and builds the candidate from the supplied archive. The framework stages the installation and checks the packing list. `lib-depends-check` verifies its shared library declarations, and the last command prints the full path to `libremerge-1.5.0p0.tgz`.
 
 ## Build and verify a development candidate
 
@@ -57,6 +57,6 @@ sh packaging/openbsd/make-source.sh "$PWD/build/_deps/openbsd-distfiles" "$PWD/o
 
 The port recipe is extracted from this archive when the overlay is prepared. Each candidate gets private distfiles, build objects and package output, so a previous candidate with the same package name cannot satisfy the build. The helper creates the OpenBSD `distinfo` for those exact archive bytes. The independently distributed `SHA256` verifies the archive before this step.
 
-The OpenBSD workflow builds and installs the documented checkout, runs CTest and the application self-tests, then builds the port from the complete archive. A separate job boots the official installer on an empty virtual disk. Only the package, checksum and test scripts are copied to that installation. It runs `pkg_add` and opens file and folder comparisons in X11, saves a merge, and compares the saved file and its backup with the original fixtures. Successful runs offer the standalone `.tgz` and a bundle containing its corresponding source and checksums. The FreeBSD workflow continues to exercise its own source, binary installations and upgrades.
+The OpenBSD workflow verifies the documented source update on an existing checkout, builds and installs the application, runs CTest and the application self-tests, then builds the port from the complete archive. A separate job boots the official installer on an empty virtual disk. It tests a fresh package installation and an upgrade from the previous package with `pkg_add -u`. It opens file and folder comparisons in X11, saves a merge, and compares the saved file and its backup with the original fixtures. Successful runs offer the standalone `.tgz` and a bundle containing its corresponding source and checksums. The FreeBSD workflow exercises its own source builds, package installations and upgrades.
 
 For another OpenBSD release or architecture, use that release’s matching base system, ports tree and package set, and verify the resulting binary in a fresh installation. When publishing a changed package for an existing OpenBSD release, update the port’s version or `REVISION` so `pkg_add -u` can recognize the upgrade.

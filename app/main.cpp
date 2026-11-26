@@ -1522,7 +1522,7 @@ int main(int argc, char *argv[])
 // 				"the pages are the project's own, the About box's among them");
 // LM4BSD REPLACEMENT
 #if defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
-			const QUrl home(QStringLiteral("https://github.com/AlfredoLlaquet/libremerge-freebsd"));
+			const QUrl home(QStringLiteral("https://github.com/AlfredoLlaquet/libremerge-bsd"));
 			check(lm::projectPage() == home && lm::projectIssuesPage() == home
 				&& lm::projectTranslationsPage() == home && AboutDialog::homepageUrl() == home,
 				"Help and About direct users to the downstream repository");

@@ -37,7 +37,7 @@ namespace lm
 #if defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
 QUrl projectPage()
 {
-	return QUrl(QStringLiteral("https://github.com/AlfredoLlaquet/libremerge-freebsd"));
+	return QUrl(QStringLiteral("https://github.com/AlfredoLlaquet/libremerge-bsd"));
 }
 
 QUrl projectIssuesPage()

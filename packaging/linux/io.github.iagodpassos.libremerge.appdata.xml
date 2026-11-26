@@ -42,7 +42,7 @@
   <!-- LM4BSD BEGIN — Direct support for this fork to its repository. -->
   <!-- <url type="bugtracker">https://github.com/iagodpassos/libremerge/issues</url> -->
   <!-- LM4BSD REPLACEMENT -->
-  <url type="help">https://github.com/AlfredoLlaquet/libremerge-freebsd</url>
+  <url type="help">https://github.com/AlfredoLlaquet/libremerge-bsd</url>
   <!-- LM4BSD END -->
   <url type="donation">https://buymeacoffee.com/iagodpassos</url>
 
