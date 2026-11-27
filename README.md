@@ -2,7 +2,7 @@
 
 LibreMerge is a graphical tool for comparing and merging files and folders. In this repository you will find independently maintained ports for FreeBSD and OpenBSD.
 
-Programmed by **ChatGPT** for Alfredo Llaquet-Alsina.
+Created and directed by **Alfredo Llaquet-Alsina**. Implemented by **ChatGPT**.
 
 ## Install from a FreeBSD package
 
