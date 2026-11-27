@@ -4,6 +4,7 @@
 #include "FolderCompareView.h"
 #include "DisplayFilterBar.h"
 #include "EngineOptions.h"
+#include "FileFilterHelper.h"
 #include "FileFilterMenu.h"
 #include "FileFilters.h"
 #include "FileOps.h"
@@ -160,9 +161,54 @@ QString categoryText(lm::FolderCompareItem::Category category,
 		return QObject::tr("Does not exist on the right");
 	case lm::FolderCompareItem::Skipped: return QObject::tr("Skipped");
 	case lm::FolderCompareItem::Error: return QObject::tr("Error");
+	case lm::FolderCompareItem::Aborted: return QObject::tr("Item aborted");
 	case lm::FolderCompareItem::NotCompared: return QString();
 	}
 	return {};
+}
+
+/** GetColImage: WinMerge's image of an item, by its result and, for
+    files a content compare took, their kind. */
+QIcon categoryIcon(lm::FolderCompareItem::Category category,
+	lm::FolderCompareItem::FileType type, bool isDir)
+{
+	using Item = lm::FolderCompareItem;
+	using D = lm::DiffImage;
+	const auto image = [isDir](D dir, D file) { return lm::diffImage(isDir ? dir : file); };
+	switch (category)
+	{
+	case Item::Error: return lm::diffImage(D::Error);
+	case Item::Aborted: return lm::diffImage(D::Abort);
+	case Item::Skipped: return image(D::DirSkip, D::Skip);
+	case Item::LeftOnly: return image(D::LDirUnique, D::LUnique);
+	case Item::MiddleOnly: return image(D::MDirUnique, D::MUnique);
+	// the second of two sides is the right one
+	case Item::RightOnly: return image(D::RDirUnique, D::RUnique);
+	case Item::MissingLeft: return image(D::LDirMissing, D::LMissing);
+	case Item::MissingMiddle: return image(D::MDirMissing, D::MMissing);
+	case Item::MissingRight: return image(D::RDirMissing, D::RMissing);
+	case Item::Identical:
+		switch (type)
+		{
+		case Item::TextFiles: return image(D::DirSame, D::TextSame);
+		case Item::BinaryFiles: return image(D::DirSame, D::BinSame);
+		case Item::ImageFiles: return image(D::DirSame, D::ImageSame);
+		case Item::UnknownType: break;
+		}
+		return image(D::DirSame, D::Same);
+	case Item::Different:
+		switch (type)
+		{
+		case Item::TextFiles: return image(D::DirDiff, D::TextDiff);
+		case Item::BinaryFiles: return image(D::DirDiff, D::BinDiff);
+		case Item::ImageFiles: return image(D::DirDiff, D::ImageDiff);
+		case Item::UnknownType: break;
+		}
+		return image(D::DirDiff, D::Diff);
+	case Item::NotCompared: break;
+	}
+	// DIFFIMG_DIR, DIFFIMG_FILE: no result
+	return image(D::Dir, D::File);
 }
 
 /** WinMerge's COMPAREFLAGS3WAY suffix on the Result column. */
@@ -246,6 +292,7 @@ void FolderCompareView::setRowCategory(QTreeWidgetItem *row,
 		? QObject::tr("Folder: %1").arg(text) : text);
 	row->setData(0, RoleCategory, static_cast<int>(category));
 	row->setData(0, RoleThreeWay, static_cast<int>(threeWay));
+	row->setIcon(ColName, categoryIcon(category, type, isDir));
 	// OnCustomDraw: the items in the scheme's colors, unless the folder
 	// comparison colors none (OPT_DIRCLR_USE_COLORS)
 	QColor color;
@@ -922,6 +969,12 @@ int FolderCompareView::rowCategoryForTest(const QString &name) const
 	return row != nullptr ? row->data(0, RoleCategory).toInt() : -1;
 }
 
+QIcon FolderCompareView::rowIconForTest(const QString &name) const
+{
+	const QTreeWidgetItem *row = findRowByName(name);
+	return row != nullptr ? row->icon(ColName) : QIcon();
+}
+
 QString FolderCompareView::rowResultForTest(const QString &name) const
 {
 	QTreeWidgetItem *row = findRowByName(name);
@@ -1411,12 +1464,17 @@ void FolderCompareView::rebuildRows()
 		row->setData(0, RoleItemIndex, place);
 	}
 	// without the subfolders, ".." goes up to the parent folders, when
-	// they are there (AddSpecialItems, AddParentFolderItem)
-	if (!m_recursive && !parentFolders().isEmpty())
+	// they are there, and is there disabled at an archive's root
+	// (AddSpecialItems, AddParentFolderItem)
+	QStringList parents;
+	const Upward upward = m_recursive ? Upward::Never : upwardDirectory(&parents);
+	if (upward != Upward::Never)
 	{
 		auto *up = new FolderRow(m_tree);
 		up->setText(ColName, QStringLiteral(".."));
-		up->setIcon(ColName, style()->standardIcon(QStyle::SP_FileDialogToParent));
+		// DIFFIMG_DIRUP, DIFFIMG_DIRUP_DISABLE
+		up->setIcon(ColName, lm::diffImage(upward == Upward::No
+			? lm::DiffImage::DirUpDisable : lm::DiffImage::DirUp));
 		up->setData(0, RoleParentFolder, true);
 		up->setData(0, RoleIsFile, false);
 		up->setData(0, RoleName, QStringLiteral(".."));
@@ -1449,6 +1507,7 @@ QTreeWidgetItem *FolderCompareView::folderNode(const QString &folder,
 		? new FolderRow(parent) : new FolderRow(m_tree);
 	row->setText(ColName, name);
 	row->setText(ColFolder, parentFolder);
+	row->setIcon(ColName, lm::diffImage(lm::DiffImage::Dir));
 	for (int i = 0; i < m_sides; ++i)
 	{
 		const QString path = m_roots[i] + QLatin1Char('/') + folder;
@@ -1769,24 +1828,50 @@ QStringList FolderCompareView::roots() const
 	return dirs;
 }
 
-QStringList FolderCompareView::parentFolders() const
+FolderCompareView::Upward FolderCompareView::upwardDirectory(QStringList *parents) const
 {
-	QStringList parents;
+	parents->clear();
+	// an archive's folders (CTempPathContext), at their root as the left
+	// side's path says: no folder above them to go up to, as an archive
+	// opened from a folder comparison opens in a tab of its own here.
+	// None at all when the global filter leaves the archives themselves
+	// out. Upstream also goes up from the root of the "original" and
+	// "altered" halves of one archive (its Zip > Both), which LibreMerge
+	// does not compare
+	if (!m_archiveRoots.isEmpty() && m_archiveSources.size() == m_sides
+		&& QDir::cleanPath(m_roots[0]).length()
+			<= QDir::cleanPath(m_archiveRoots.at(0)).length())
+	{
+		// through IDiffFilter, as upstream holds it (m_piFilterGlobal)
+		const IDiffFilter *filter = lm::globalFileFilter();
+		const auto source = [this](int side) {
+			return m_archiveSources.at(side).toStdString();
+		};
+		const bool included = filter == nullptr || (m_sides < 3
+			? filter->includeFile(source(0), source(1))
+			: filter->includeFile(source(0), source(1), source(2)));
+		return included ? Upward::No : Upward::Never;
+	}
+	// the folders the compared ones are in, when every side has one
 	for (int i = 0; i < m_sides; ++i)
 	{
 		const QString root = QDir::cleanPath(m_roots[i]);
 		const QString parent = QFileInfo(root).path();
 		if (parent == root || !QFileInfo(parent).isDir())
-			return {};
-		parents.append(parent);
+		{
+			parents->clear();
+			return Upward::Never;
+		}
+		parents->append(parent);
 	}
-	return parents;
+	return Upward::Regular;
 }
 
 void FolderCompareView::openParentFolders()
 {
-	const QStringList parents = parentFolders();
-	if (parents.isEmpty())
+	// a disabled ".." goes nowhere (OpenParentDirectory)
+	QStringList parents;
+	if (upwardDirectory(&parents) != Upward::Regular)
 		return;
 	if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier)
 		emit openFolderComparisonRequested(parents);

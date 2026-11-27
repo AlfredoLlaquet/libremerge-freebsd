@@ -133,6 +133,7 @@ run_one selftest-markers
 run_one selftest-open-enter
 run_one selftest-archive
 run_one selftest-archive-mixed
+run_one selftest-archive-up
 run_one selftest-folder3
 run_one selftest-service
 run_one selftest-marker

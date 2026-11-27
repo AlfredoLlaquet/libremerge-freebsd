@@ -56,12 +56,6 @@ su -l lmbuild -c "set -eu
     git config branch.main.merge refs/heads/main
     git config url.file:///home/lmbuild/update-origin.git.insteadOf https://github.com/AlfredoLlaquet/libremerge-bsd.git"
 build_and_install
-if [ ! -f "$workspace/previous-package/$previous_pkgname.tgz" ]; then
-    su -l lmbuild -c '
-        cd libremerge-bsd &&
-            sh packaging/openbsd/make-source.sh "$PWD/build/_deps/openbsd-distfiles" "$HOME/previous-source"
-    '
-fi
 su -l lmbuild -c "set -eu
     cd libremerge-bsd
     git remote set-url origin https://github.com/AlfredoLlaquet/libremerge-bsd.git
@@ -101,13 +95,7 @@ build_port() (
 )
 
 mkdir -p "$workspace/out/previous"
-if [ -f "$workspace/previous-package/$previous_pkgname.tgz" ]; then
-    cp "$workspace/previous-package/$previous_pkgname.tgz" "$workspace/out/previous/"
-else
-    # Actions artifacts expire. The initial OpenBSD release candidate had no
-    # tagged package, so use its real, unmodified older port as a fallback.
-    build_port /home/lmbuild/previous-source/*-source.tar.gz "$workspace/out/previous"
-fi
+cp "$workspace/previous-package/$previous_pkgname.tgz" "$workspace/out/previous/"
 (cd "$workspace/out/previous" && sha256 "$previous_pkgname.tgz" > SHA256)
 
 cp /home/lmbuild/release/*-source.tar.gz "$workspace/out/"

@@ -1,7 +1,6 @@
 # LM4BSD BEGIN ADDITION — Local OpenBSD port of the complete candidate source.
 COMMENT =		graphical file and folder comparison and merging
-DISTNAME =		libremerge-1.5.0
-REVISION =		0
+DISTNAME =		libremerge-1.6.0
 CATEGORIES =		textproc
 HOMEPAGE =		https://github.com/AlfredoLlaquet/libremerge-bsd
 

@@ -5,7 +5,6 @@ on: [push, pull_request, workflow_dispatch]
 
 permissions:
   contents: read
-  actions: read
 
 jobs:
   build:
@@ -18,27 +17,14 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Obtain the exact previous OpenBSD package while its artifact is available
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Download and verify the previously released OpenBSD package
         run: |
           . packaging/openbsd/ci/previous.conf
-          archive="$RUNNER_TEMP/previous-openbsd.zip"
-          url="$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/artifacts/$previous_bundle_id/zip"
-          status=$(curl --silent --show-error --location --retry 3 \
-            --header "Authorization: Bearer $GH_TOKEN" --output "$archive" --write-out '%{http_code}' "$url")
-          case "$status" in
-            200)
-              mkdir previous-package
-              cd previous-package
-              unzip -p "$archive" "$previous_pkgname.tgz" > "$previous_pkgname.tgz"
-              printf '%s  %s\n' "$previous_package_sha256" "$previous_pkgname.tgz" | sha256sum --check -
-              ;;
-            404|410)
-              echo "The historical artifact is unavailable. The VM will build its pinned source commit."
-              ;;
-            *) echo "Previous package download returned HTTP $status" >&2; exit 1 ;;
-          esac
+          mkdir previous-package
+          cd previous-package
+          url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/$previous_tag/$previous_pkgname.tgz"
+          curl --fail --silent --show-error --location --retry 3 --output "$previous_pkgname.tgz" "$url"
+          printf '%s  %s\n' "$previous_package_sha256" "$previous_pkgname.tgz" | sha256sum --check -
       - uses: vmactions/openbsd-vm@f1ca8bc8ecc5b6ef7218e5b914836e067e1546d3 # v1.4.9
         with:
           release: '8.0'

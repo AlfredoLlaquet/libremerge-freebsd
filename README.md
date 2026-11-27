@@ -8,16 +8,16 @@ Created and directed by **Alfredo Llaquet-Alsina**. Implemented by **ChatGPT**.
 
 Download the package for your version of FreeBSD. You can [verify the download](#verify-the-freebsd-package) before installing it. Open a **root shell** in the directory where you saved it and run the matching command below.
 
-| Release download | Install command for revision 4 |
+| Release download | Install command for BSD revision 1 |
 | --- | --- |
-| [FreeBSD 14 amd64 package](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.5.0-bsd.4/libremerge-1.5.0_4-FreeBSD-14-amd64.pkg) | `pkg install ./libremerge-1.5.0_4-FreeBSD-14-amd64.pkg` |
-| [FreeBSD 15 amd64 package](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.5.0-bsd.4/libremerge-1.5.0_4-FreeBSD-15-amd64.pkg) | `pkg install ./libremerge-1.5.0_4-FreeBSD-15-amd64.pkg` |
+| [FreeBSD 14 amd64 package](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.6.0-bsd.1/libremerge-1.6.0_1-FreeBSD-14-amd64.pkg) | `pkg install ./libremerge-1.6.0_1-FreeBSD-14-amd64.pkg` |
+| [FreeBSD 15 amd64 package](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.6.0-bsd.1/libremerge-1.6.0_1-FreeBSD-15-amd64.pkg) | `pkg install ./libremerge-1.6.0_1-FreeBSD-15-amd64.pkg` |
 
 The `./` selects the local file. `pkg` fetches any missing runtime dependencies from your configured FreeBSD repositories. Open **LibreMerge** from your desktop’s applications menu, or run `libremerge` in a terminal as your regular user.
 
 ## Verify the FreeBSD package
 
-Save [SHA256SUMS for revision 4](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.5.0-bsd.4/SHA256SUMS) in the same directory as your `.pkg` file. Keep both original filenames. Before installing or updating, run this command in that directory as your regular user.
+Save [SHA256SUMS for BSD revision 1](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.6.0-bsd.1/SHA256SUMS) in the same directory as your `.pkg` file. Keep both original filenames. Before installing or updating, run this command in that directory as your regular user.
 
 ```sh
 sha256sum --ignore-missing -c SHA256SUMS
@@ -63,7 +63,7 @@ These steps build LibreMerge with the base system’s Clang and `make` and insta
    libremerge
    ```
 
-The [complete FreeBSD source archive](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.5.0-bsd.4/libremerge-1.5.0_4-source.tar.gz) includes the syntax grammars used by the binary packages. To build it offline after installing the system dependencies, verify the archive with the release’s `SHA256SUMS`, unpack it, and run the build commands above from the extracted directory. Add `-DLM_TREE_SITTER_DOWNLOAD_DIR="$PWD/distfiles"` to the CMake configuration command.
+The [complete FreeBSD source archive](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.6.0-bsd.1/libremerge-1.6.0_1-source.tar.gz) includes the syntax grammars used by the binary packages. To build it offline after installing the system dependencies, verify the archive with the release’s `SHA256SUMS`, unpack it, and run the build commands above from the extracted directory. Add `-DLM_TREE_SITTER_DOWNLOAD_DIR="$PWD/distfiles"` to the CMake configuration command.
 
 ## Update on FreeBSD from source
 
@@ -91,29 +91,29 @@ su root -c 'make install'
 
 ## Install from an OpenBSD package
 
-The ports-built package is for **OpenBSD 8.0 on amd64**. Run `uname -r` and `machine -a` to check your system. Save the [OpenBSD 8.0 amd64 package](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.5.0-bsd.4/libremerge-1.5.0p0.tgz) and its [SHA256 file](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.5.0-bsd.4/SHA256) in a directory of their own. As your regular user, verify the download in that directory.
+The ports-built package is for **OpenBSD 8.0 on amd64**. Run `uname -r` and `machine -a` to check your system. Save the [OpenBSD 8.0 amd64 package](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.6.0-bsd.1/libremerge-1.6.0.tgz) and its [SHA256 file](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.6.0-bsd.1/SHA256) in a directory of their own. As your regular user, verify the download in that directory.
 
 ```sh
-sha256 -C SHA256 libremerge-1.5.0p0.tgz
+sha256 -C SHA256 libremerge-1.6.0.tgz
 ```
 
 After the checksum reports `OK`, open a root shell in the same directory and install from it. The command trusts this directory for the fork’s unsigned package and uses your configured OpenBSD mirror for dependencies.
 
 ```sh
-env TRUSTED_PKG_PATH="$PWD" PKG_PATH=installpath pkg_add libremerge-1.5.0p0
+env TRUSTED_PKG_PATH="$PWD" PKG_PATH=installpath pkg_add libremerge-1.6.0
 ```
 
 Run `libremerge` as your regular user in your graphical session, or open **LibreMerge** from the applications menu. To remove the package later, run `pkg_delete libremerge` as root.
 
 ## Update from an OpenBSD package
 
-Close LibreMerge. Download the newer OpenBSD package and its matching `SHA256` file from the [installation section](#install-from-an-openbsd-package) or the [releases page](https://github.com/AlfredoLlaquet/libremerge-bsd/releases). Save them together in a fresh directory and verify the new filename as shown above. For this release, the expected package name is `libremerge-1.5.0p0`.
+Close LibreMerge. Download the newer OpenBSD package and its matching `SHA256` file from the [installation section](#install-from-an-openbsd-package) or the [releases page](https://github.com/AlfredoLlaquet/libremerge-bsd/releases). Save them together in a fresh directory and verify the new filename as shown above. For this release, the expected package name is `libremerge-1.6.0`.
 
 Run these commands in a root shell in the download directory to upgrade the installed package and check the result.
 
 ```sh
 env TRUSTED_PKG_PATH="$PWD" PKG_PATH=installpath pkg_add -u libremerge
-pkg_info -e libremerge-1.5.0p0
+pkg_info -e libremerge-1.6.0
 ```
 
 The second command prints the new package name when it is installed. Reopen LibreMerge in your desktop session as your regular user.
@@ -185,8 +185,8 @@ All packages listed here are for **amd64** (64-bit Intel or AMD). Choose the pac
 | Package | Built on | Installation tests passed |
 | --- | --- | --- |
 | FreeBSD 14 amd64 | 14.4-RELEASE | Fresh installation and upgrade on 14.4 and 14.5 |
-| FreeBSD 15 amd64 | 15.1-RELEASE-p6 | Fresh installation and upgrade on 15.1-RELEASE-p6 |
-| OpenBSD 8.0 amd64 | 8.0 | Fresh installation on 8.0 and upgrade from the earlier `libremerge-1.5.0` package |
+| FreeBSD 15 amd64 | 15.1-RELEASE | Fresh installation and upgrade on 15.1-RELEASE |
+| OpenBSD 8.0 amd64 | 8.0 | Fresh installation on 8.0 and upgrade from the published `libremerge-1.5.0p0` package |
 
 **Expected FreeBSD compatibility.** Later patch levels and later minor releases in the same FreeBSD major series on amd64 should work when compatible versions of Qt and the other runtime libraries are available. A later 14.x release would use the FreeBSD 14 package.
 
@@ -274,10 +274,10 @@ LibreMerge dirA/ dirB/                 # folder compare
 Dependencies: a C++17 compiler, CMake ≥ 3.24, Ninja, Qt 6.4 or newer, POCO, ICU, Boost (headers), libarchive, re2c and lemon. The first configure downloads the sources of the Tree-sitter grammars WinMerge uses, about 12 MB (`-DLM_TREE_SITTER_GRAMMARS=OFF` builds without them). On macOS: `brew install cmake ninja qt poco icu4c boost googletest re2c lemon libarchive`. On Debian/Ubuntu see the package list in [`.github/workflows`](.github/workflows).
 
 ```sh
-cmake -S . -B build -G Ninja
+cmake -S . -B build -G Ninja  # -DLM_BUILD_TESTS=OFF leaves the tests out
 cmake --build build
 ctest --test-dir build        # engine test suite (417 tests)
-./build/app/LibreMerge        # (on macOS: build/app/LibreMerge.app)
+./build/app/libremerge        # on macOS: open build/app/LibreMerge.app
 ```
 
 ## Install (Linux)
@@ -298,9 +298,13 @@ brew install --cask iagodpassos/tap/libremerge
 
 **Dolphin (KDE)**: the AppImage's desktop integration, the Homebrew cask and an install from source (`cmake --install`, and so the PKGBUILD below) add *Compare with LibreMerge* to Dolphin's context menu when one to three files or folders are selected, like WinMerge's shell extension: two or three are compared, and one opens the selection window with it filled in.
 
-**Arch Linux**: an AUR package is on the way. Meanwhile, `packaging/aur/PKGBUILD` on the `main` branch builds and installs the latest release with `makepkg -si`; the copy inside a release tag still points to the version before it, as it is updated right after each release is tagged.
+**Arch Linux**: an AUR package is on the way. Meanwhile, `packaging/aur/PKGBUILD` on the `main` branch builds and installs the latest release with `makepkg -si`; the copy inside a release tag still points to the version before it, as it is updated right after each release is tagged. To try what is on `main` before it is released, `packaging/aur-git/PKGBUILD` builds the branch itself (as `libremerge-git`, in place of `libremerge`).
 
 Other formats (native .deb packages, Flatpak) come back if there is demand — open an issue if you need one and it moves up the list.
+
+## FreeBSD and OpenBSD
+
+LibreMerge has ports for FreeBSD and OpenBSD, with binary packages and instructions to build from source, maintained independently downstream of this repository and kept in step with its releases: [libremerge-bsd](https://github.com/AlfredoLlaquet/libremerge-bsd). For FreeBSD or OpenBSD, get it from there.
 
 ## Use with git
 

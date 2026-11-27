@@ -106,6 +106,15 @@ qt_add_resources(LibreMerge "desktop"
   FILES ${LM_DESKTOP_FILES}
 )
 
+# WinMerge's icons of the folder comparison's items (diffimages/README.md)
+file(GLOB LM_DIFF_IMAGES CONFIGURE_DEPENDS
+  ${CMAKE_CURRENT_SOURCE_DIR}/diffimages/*.png)
+qt_add_resources(LibreMerge "diffimages"
+  PREFIX "/"
+  BASE ${CMAKE_CURRENT_SOURCE_DIR}
+  FILES ${LM_DIFF_IMAGES}
+)
+
 if(APPLE)
   enable_language(OBJCXX)
   target_sources(LibreMerge PRIVATE MacServices.mm)
@@ -199,8 +208,8 @@ endif()
 set_target_properties(LibreMerge PROPERTIES
   MACOSX_BUNDLE TRUE
   MACOSX_BUNDLE_GUI_IDENTIFIER org.libremerge.LibreMerge
-  MACOSX_BUNDLE_BUNDLE_VERSION 1.5.0
-  MACOSX_BUNDLE_SHORT_VERSION_STRING 1.5.0
+  MACOSX_BUNDLE_BUNDLE_VERSION 1.6.0
+  MACOSX_BUNDLE_SHORT_VERSION_STRING 1.6.0
   MACOSX_BUNDLE_ICON_FILE AppIcon.icns
   MACOSX_BUNDLE_BUNDLE_NAME LibreMerge
   MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/packaging/Info.plist.in

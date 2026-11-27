@@ -15,7 +15,7 @@ Keep the application name **LibreMerge**. The goal is to make the existing Qt 6 
 
 Since November 26, 2026, the same fork also targets OpenBSD. Develop both platforms on `development`. Preserve existing FreeBSD source, binary, and upgrade coverage when extending OpenBSD support. The initial OpenBSD target is 8.0 amd64, with both installation from source and a binary produced by OpenBSD’s ports framework.
 
-Programmed by **ChatGPT** for Alfredo Llaquet-Alsina.
+Created and directed by **Alfredo Llaquet-Alsina**. Implemented by **ChatGPT**.
 
 ## Marking FreeBSD/OpenBSD code changes
 
@@ -97,7 +97,7 @@ When integrating an upstream tag or commit, copy the complete `README.md` from t
 
 LibreMerge as a whole is licensed under **GNU GPL version 3 or later**. Preserve copyright and license notices, retain the notices for bundled components, and identify and date downstream modifications. When distributing a binary, make its complete corresponding source available, including the BSD patches and build scripts used for that release. [License](LICENSE) · [Bundled components and their licenses](docs/VENDORED.md)
 
-Use the package name `libremerge`, a monotonically increasing FreeBSD package version (for example `1.5.0_4` for tag `v1.5.0-bsd.4`), and a distinct filename for each major ABI. Update `packaging/freebsd/release.conf` and the README examples together. Test upgrades with the previously published binary for each ABI. On OpenBSD, use the release’s ports framework and bump the port’s `REVISION` when repackaging the same upstream version. The first revision of `1.5.0` is `1.5.0p0`.
+Use the package name `libremerge`, a monotonically increasing FreeBSD package version (for example `1.5.0_4` for tag `v1.5.0-bsd.4`), and a distinct filename for each major ABI. Update `packaging/freebsd/release.conf` and the README examples together. Test upgrades with the previously published binary for each ABI. On OpenBSD, use the release’s ports framework and bump the port’s `REVISION` when repackaging the same upstream version. Omit `REVISION` for the first package of a new upstream version. Point the OpenBSD upgrade test at the previous published tag, source commit, package name, and SHA-256 in `packaging/openbsd/ci/previous.conf`.
 
 Take the two tested FreeBSD packages, the complete FreeBSD source archive and `SHA256SUMS` from the verified run’s `libremerge-FreeBSD-amd64` artifact. Take the tested OpenBSD package, its corresponding source archive and native `SHA256` from the matching `libremerge-OpenBSD-8.0-amd64` artifact for the same commit. The FreeBSD source includes the build scripts, BSD changes, license notices and grammar distfiles. For an offline FreeBSD grammar build from the unpacked source, pass `-DLM_TREE_SITTER_DOWNLOAD_DIR="$PWD/distfiles"` at configure time. The OpenBSD archive also supplies the sources used for its private Poco Foundation and SQLite Lemon builds.
 

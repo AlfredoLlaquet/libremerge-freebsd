@@ -4,12 +4,12 @@ LibreMerge’s local port builds an ordinary OpenBSD package with `bsd.port.mk`.
 
 ## Build from the complete source archive
 
-Download the [complete OpenBSD source archive](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.5.0-bsd.4/libremerge-1.5.0-source.tar.gz) and its [SHA256 file](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.5.0-bsd.4/SHA256). The archive contains the source used to build `libremerge-1.5.0p0.tgz`, the port recipe, and the pinned copies of Poco Foundation, SQLite Lemon, and the syntax grammars. Save both files in the same directory. With the [OpenBSD source-build dependencies](../../README.md#install-on-openbsd-from-source) installed, run the following as a regular user.
+Download the [complete OpenBSD source archive](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.6.0-bsd.1/libremerge-1.6.0-source.tar.gz) and its [SHA256 file](https://github.com/AlfredoLlaquet/libremerge-bsd/releases/download/v1.6.0-bsd.1/SHA256). The archive contains the source used to build `libremerge-1.6.0.tgz`, the port recipe, and the pinned copies of Poco Foundation, SQLite Lemon, and the syntax grammars. Save both files in the same directory. With the [OpenBSD source-build dependencies](../../README.md#install-on-openbsd-from-source) installed, run the following as a regular user.
 
 ```sh
-sha256 -C SHA256 libremerge-1.5.0-source.tar.gz
-tar -xzf libremerge-1.5.0-source.tar.gz
-cd libremerge-1.5.0
+sha256 -C SHA256 libremerge-1.6.0-source.tar.gz
+tar -xzf libremerge-1.6.0-source.tar.gz
+cd libremerge-1.6.0
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local \
     -DLM_OPENBSD_DISTFILES="$PWD/distfiles" -DFETCHCONTENT_FULLY_DISCONNECTED=ON
 cmake --build build --parallel 2
@@ -32,12 +32,12 @@ signify -C -p /etc/signify/openbsd-80-base.pub -x SHA256.sig ports.tar.gz
 su root -c 'tar -C /usr -xzf ports.tar.gz'
 ```
 
-In a root shell, start in the directory containing the verified LibreMerge source archive and its unpacked `libremerge-1.5.0` directory. Set `PKG_PATH` before installing any build dependencies on this machine. The literal release URL selects the package set that matches `ports.tar.gz`. Put the work directory on a filesystem with room for the extracted source and compilation. On systems configured with `PORTS_PRIVSEP=Yes`, its parent must be accessible to the ports build users. The helper applies the framework’s ownership settings inside the new work directory.
+In a root shell, start in the directory containing the verified LibreMerge source archive and its unpacked `libremerge-1.6.0` directory. Set `PKG_PATH` before installing any build dependencies on this machine. The literal release URL selects the package set that matches `ports.tar.gz`. Put the work directory on a filesystem with room for the extracted source and compilation. On systems configured with `PORTS_PRIVSEP=Yes`, its parent must be accessible to the ports build users. The helper applies the framework’s ownership settings inside the new work directory.
 
 ```sh
 export PKG_PATH=https://cdn.openbsd.org/pub/OpenBSD/8.0/packages/amd64/
-archive="$PWD/libremerge-1.5.0-source.tar.gz"
-port=$(sh libremerge-1.5.0/packaging/openbsd/prepare-port.sh "$archive" /usr/local/pobj)
+archive="$PWD/libremerge-1.6.0-source.tar.gz"
+port=$(sh libremerge-1.6.0/packaging/openbsd/prepare-port.sh "$archive" /usr/local/pobj)
 cd "$port"
 make FETCH_PACKAGES= prepare install-depends
 make FETCH_PACKAGES=No package
@@ -45,7 +45,7 @@ make lib-depends-check
 make show=PKGFILE
 ```
 
-The first `make` installs build and runtime dependencies from the OpenBSD package mirrors. The second turns off binary fetching for LibreMerge itself and builds the candidate from the supplied archive. The framework stages the installation and checks the packing list. `lib-depends-check` verifies its shared library declarations, and the last command prints the full path to `libremerge-1.5.0p0.tgz`.
+The first `make` installs build and runtime dependencies from the OpenBSD package mirrors. The second turns off binary fetching for LibreMerge itself and builds the candidate from the supplied archive. The framework stages the installation and checks the packing list. `lib-depends-check` verifies its shared library declarations, and the last command prints the full path to `libremerge-1.6.0.tgz`.
 
 ## Build and verify a development candidate
 

@@ -162,10 +162,10 @@ comment, which Qt Linguist shows next to it:
 
 | Catalog | WinMerge's, unchanged | Fitted | LibreMerge's own | Left in English upstream | Changed in review |
 |---|---|---|---|---|---|
-| German | 802 | 212 | 260 | 3 | 3 |
-| Spanish | 790 | 222 | 258 | 10 | 0 |
-| Catalan | 463 | 217 | 260 | 340 | 0 |
-| French | 800 | 235 | 242 | 3 | 0 |
+| German | 803 | 212 | 260 | 3 | 3 |
+| Spanish | 791 | 222 | 258 | 10 | 0 |
+| Catalan | 464 | 217 | 260 | 340 | 0 |
+| French | 801 | 235 | 242 | 3 | 0 |
 
 The texts WinMerge's translators wrote stay as they are, the odd ones
 included: a text follows WinMerge's wording until a review says
@@ -364,6 +364,18 @@ and its numbers (`DrawMargin`), the folder items by result
   the platform's, which on macOS has no place for the sixteen custom
   colors that upstream's `ChooseColor` keeps in the options
   (`Options::CustomColors`) and a scheme saves.
+
+## Item icons of the folder comparison
+
+`app/diffimages` holds WinMerge's own icons of the folder comparison's
+items, taken from `Src/res` at `700da377c` (GPL-2.0-or-later, the design
+credited to WinMerge's contributors in its `Docs/Users/Contributors.txt`):
+every image of `DiffImageListUtils::InitializeDiffImageList` but the web
+page ones, as one PNG per size each `.ico` holds, the image of the most
+colors of that size, pixel for pixel. Which image an item gets follows
+`GetColImage`. Most were brought in by @KrokusPokus in PR #27; `aborted`
+and `folderup_disable` came after, the same way. Their own README in that
+folder says how they were converted.
 
 ## Deliberately excluded (and why)
 
